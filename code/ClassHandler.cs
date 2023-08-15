@@ -10,7 +10,6 @@ using TerrorTown;
 namespace TCT_Classes
 {
 
-
 	public class TTT_ClassHeader: BaseNetworkable
 	{
 		public string Name;
@@ -39,7 +38,12 @@ namespace TCT_Classes
 
 		public abstract string Description { get; set; }
 
-		//Run on Ability trigger
+		private RealTimeUntil AbilityCooldown;
+
+		public bool HasActiveAbility = false;
+		public float CoolDownTimer;
+
+		//Run on Ability Trigger
 		public abstract void ActiveAbility();
 
 		//Run on start
@@ -47,12 +51,13 @@ namespace TCT_Classes
 
 		protected TTT_Class()
 		{
-
+			//Touching this causes errors!
 		}
 
 		protected void Add_Item_To_Player(ModelEntity item)
 		{
 			item.Position = Entity.Position;
+			
 		}
 		protected void Add_Item_To_Player( TypeDescription item )
 		{
@@ -66,6 +71,14 @@ namespace TCT_Classes
 				spawned.Position = Entity.Position;
 			}
 		}
+
+
+		[GameEvent.Client.Frame]
+		protected void Look_For_Active_Button_Press()
+		{
+			
+		}
+
 
 	}
 

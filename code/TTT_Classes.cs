@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerrorTown;
+using GoldDeagle;
 
 namespace TCT_Classes
 {
-	public class Test_Class :TTT_Class
+	public class Bountyhunter : TTT_Class
 	{
 
-		public override string Name { get; set; } = "TestClass";
-		public override string Description { get; set; } = "TestClass";
+		public override string Name { get; set; } = "Bountyhunter";
+		public override string Description { get; set; } = "Test";
 
 		public override Color Color { get; set; }
 
@@ -25,14 +26,16 @@ namespace TCT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			Entity.Inventory.AddItem( new TerrorTown.C4() );
+
+			Add_Item_To_Player( new GoldDeagle.GoldenDeagle());
+			Add_Item_To_Player( new TerrorTown.Radar() );
 		}
 	}
-	public class Test_Class2 : TTT_Class
+	public class Visionary : TTT_Class
 	{
 
-		public override string Name { get; set; } = "TestClass2";
-		public override string Description { get; set; } = "TestClass2";
+		public override string Name { get; set; } = "Visionary";
+		public override string Description { get; set; } = "Test";
 
 		public override Color Color { get; set; }
 
@@ -44,15 +47,16 @@ namespace TCT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			Entity.Inventory.AddItem( new TerrorTown.C4() );
+
+			Add_Item_To_Player( new TerrorTown.Visualiser() );
 		}
 	}
 
-	public class Test_Class3 : TTT_Class
+	public class DemolitionExpert : TTT_Class
 	{
 
-		public override string Name { get; set; } = "TestClass3";
-		public override string Description { get; set; } = "TestClass3";
+		public override string Name { get; set; } = "DemolitionExpert";
+		public override string Description { get; set; } = "Test";
 
 		public override Color Color { get; set; }
 
@@ -66,6 +70,26 @@ namespace TCT_Classes
 		{
 			Entity.Inventory.AddItem( new TerrorTown.C4() );
 			
+		}
+	}
+	public class Test4 : TTT_Class
+	{
+
+		public override string Name { get; set; } = "Test4";
+		public override string Description { get; set; } = "Test";
+
+		public override Color Color { get; set; }
+
+		public override void ActiveAbility()
+		{
+
+		}
+
+		//Run on start
+		public override void RoundStartAbility()
+		{
+			Entity.Inventory.AddItem( new TerrorTown.C4() );
+
 		}
 	}
 }
