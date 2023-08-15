@@ -15,15 +15,19 @@ namespace TCT_Classes
 		public string Name;
 
 		public string Description { get; set; }
-		public Color Color { get; set; }
-		public TypeDescription TypeDescription { get; set; }	
 
-		public TTT_ClassHeader(string name, Color color, string description, TypeDescription typeDescription) 
+		public Color Color { get; set; }
+		
+		public TypeDescription TypeDescription { get; set; }
+
+		public float Frequency { get; set; }
+		public TTT_ClassHeader(string name, Color color, string description, TypeDescription typeDescription, float frequency) 
 		{
 			Name = name;
 			Description = description;
 			Color = color;
 			TypeDescription = typeDescription;
+			Frequency = Math.Clamp( frequency, 0f, 1f );
 			
 		}
 
@@ -36,6 +40,7 @@ namespace TCT_Classes
 		public abstract string Name { get; set; }
 		public abstract Color Color { get; set; }
 
+		public abstract float Frequency { get; set; }
 		public abstract string Description { get; set; }
 
 		private RealTimeUntil AbilityCooldown;
@@ -102,12 +107,22 @@ namespace TCT_Classes
 		{
 			TTT_ClassHeader selected = null;
 			int AmountOfClasses = Registered_TTT_Classes.Count;
-			int selection = Game.Random.Int( AmountOfClasses - 1 );
-			Log.Info( selection );
-			Log.Info( "------");
-			Log.Info( AmountOfClasses );
-			selected = Registered_TTT_Classes[selection];
-			return selected.Name;
+			float totalFrequency = Registered_TTT_Classes.Sum( x => x.Frequency );	
+			float selection = Game.Random.Float(totalFrequency);
+			float frequencyTrack = 0 ;
+			foreach (TTT_ClassHeader header in Registered_TTT_Classes)
+			{
+				frequencyTrack = frequencyTrack + header.Frequency;
+
+				if( frequencyTrack > selection )
+				{
+					Log.Info( header.Name);
+					Log.Info( "------" );
+					return header.Name;
+				}
+			}
+			throw new Exception("How Did you do this?  --- Random select not functioning");
+			
 		}
 
 
@@ -130,34 +145,6 @@ namespace TCT_Classes
 
 
 		}
-
-	//	public static void RegisterClass( TTT_Class game )
-	//	{
-	//		Log.Info( "Attempting to register : " + game.Name );
-	//		Registered_TTT_Classes.Add( game );
-	//		// This part of the code loads the previous config if it exists.
-	//		if ( Game.IsServer )
-	//		{
-	//			if ( FileSystem.Data.FileExists( "TTT_Classes_config.json" ) )
-	//			{
-	//				var config = FileSystem.Data.ReadJson<Dictionary<string, bool>>( "TTT_Classes_config.json" );
-	//				if ( !config.ContainsKey( game.Name ) )
-	//				{
-	//					Enabled_TTT_Classes.Add( game );
-	//					return;
-	//				}
-	//				if ( config[game.Name] )
-	//				{
-	//					Enabled_TTT_Classes.Add( game );
-	//					return;
-	//				}
-	//			}
-	//			else
-	//			{
-	//				Enabled_TTT_Classes.Add( game );
-	//			}
-	//		}
-	//	}
 		
 
 
@@ -165,7 +152,7 @@ namespace TCT_Classes
 		internal static TTT_ClassHeader Convert_TTT_Class_2_Header(TypeDescription typeDescription)
 		{
 			TTT_Class temp = typeDescription.Create<TTT_Class>();
-			TTT_ClassHeader header = new TTT_ClassHeader(temp.Name, temp.Color, temp.Description, typeDescription);
+			TTT_ClassHeader header = new TTT_ClassHeader(temp.Name, temp.Color, temp.Description, typeDescription,temp.Frequency);
 			return header;
 		}
 
@@ -229,7 +216,7 @@ namespace TCT_Classes
 		}
 		// Instantiation code (mostly) copied from Teams class in TTT by Three Thieves
 		[Event( "Game.Initialized" )]
-		public static void InitialiseMinigames( MyGame _game )
+		public static void Initialise_TTT_Class( MyGame _game )
 		{
 			List<TypeDescription> list = (from type in GlobalGameNamespace.TypeLibrary.GetTypes<TTT_Class>()
 										  where type.TargetType.IsSubclassOf( typeof( TTT_Class ) )

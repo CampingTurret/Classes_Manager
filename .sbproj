@@ -13,7 +13,8 @@
   "CodePath": "/code/",
   "PackageReferences": [
     "thieves.terrortown",
-    "thieves.golden_deagle"
+    "thieves.golden_deagle",
+    "xenthio.dead_ringer"
   ],
   "EditorReferences": null,
   "Metadata": {

@@ -14,6 +14,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "Bountyhunter";
 		public override string Description { get; set; } = "Test";
+		public override float Frequency { get; set; } = 0.1f;
 
 		public override Color Color { get; set; }
 
@@ -28,7 +29,6 @@ namespace TCT_Classes
 		{
 
 			Add_Item_To_Player( new GoldDeagle.GoldenDeagle());
-			Add_Item_To_Player( new TerrorTown.Radar() );
 		}
 	}
 	public class Visionary : TTT_Class
@@ -37,6 +37,7 @@ namespace TCT_Classes
 		public override string Name { get; set; } = "Visionary";
 		public override string Description { get; set; } = "Test";
 
+		public override float Frequency { get; set; } = 1f;
 		public override Color Color { get; set; }
 
 		public override void ActiveAbility()
@@ -57,7 +58,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "DemolitionExpert";
 		public override string Description { get; set; } = "Test";
-
+		public override float Frequency { get; set; } = 1f;
 		public override Color Color { get; set; }
 
 		public override void ActiveAbility()
@@ -72,12 +73,12 @@ namespace TCT_Classes
 			
 		}
 	}
-	public class Test4 : TTT_Class
+	public class Magician : TTT_Class
 	{
 
-		public override string Name { get; set; } = "Test4";
+		public override string Name { get; set; } = "Magician";
 		public override string Description { get; set; } = "Test";
-
+		public override float Frequency { get; set; } = 1f;
 		public override Color Color { get; set; }
 
 		public override void ActiveAbility()
@@ -88,8 +89,48 @@ namespace TCT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			Entity.Inventory.AddItem( new TerrorTown.C4() );
+			Entity.Inventory.AddItem( new TerrorTown.Teleporter());
+			Entity.Inventory.AddItem( new TerrorTown.DeadRinger());
 
+		}
+	}
+	public class WallHack : TTT_Class
+	{
+
+		public override string Name { get; set; } = "WallHack";
+		public override string Description { get; set; } = "Test";
+		public override float Frequency { get; set; } = 0.7f;
+		public override Color Color { get; set; }
+
+		public override void ActiveAbility()
+		{
+
+		}
+
+		//Run on start
+		public override void RoundStartAbility()
+		{
+			Entity.Inventory.AddItem( new TerrorTown.Radar() );
+
+		}
+	}
+	public class Junkie : TTT_Class
+	{
+
+		public override string Name { get; set; } = "Junkie";
+		public override string Description { get; set; } = "Test";
+		public override float Frequency { get; set; } = 0.8f;
+		public override Color Color { get; set; }
+
+		public override void ActiveAbility()
+		{
+
+		}
+
+		//Run on start
+		public override void RoundStartAbility()
+		{
+			((TerrorTown.WalkController)Entity.MovementController).SpeedMultiplier = 1.5f;
 		}
 	}
 }
