@@ -6,18 +6,38 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 using TerrorTown;
-using System.Security.Principal;
-using System.Globalization;
 
 namespace TCT_Classes
 {
-	public abstract class TTT_Class : BaseNetworkable
+
+
+	public class TTT_ClassHeader: BaseNetworkable
 	{
+		public string Name;
+
+		public string Description { get; set; }
+		public Color Color { get; set; }
+		public TypeDescription TypeDescription { get; set; }	
+
+		public TTT_ClassHeader(string name, Color color, string description, TypeDescription typeDescription) 
+		{
+			Name = name;
+			Description = description;
+			Color = color;
+			TypeDescription = typeDescription;
+			
+		}
+
+	}
+
+	public abstract class TTT_Class : EntityComponent<TerrorTown.Player>
+	{
+
+		
 		public abstract string Name { get; set; }
 		public abstract Color Color { get; set; }
 
 		public abstract string Description { get; set; }
-		public abstract IList<ModelEntity> ClassItems { get; set; }
 
 		//Run on Ability trigger
 		public abstract void ActiveAbility();
@@ -27,37 +47,53 @@ namespace TCT_Classes
 
 		protected TTT_Class()
 		{
-			ClassHandler.RegisterClass( this );
+
 		}
 
+		protected void Add_Item_To_Player(ModelEntity item)
+		{
+			item.Position = Entity.Position;
+		}
+		protected void Add_Item_To_Player( TypeDescription item )
+		{
+			ModelEntity spawned = item.Create<ModelEntity>();
+			if(spawned == null )
+			{
+				throw new Exception( "Type does not derive from a ModelEntity" );
+			}
+			else
+			{
+				spawned.Position = Entity.Position;
+			}
+		}
 
 	}
 
 	// To Do:
 	//
 	//		- UI
-	//		- Copy sanders code were aplicable  (https://github.com/SmartMario1/Sbox-TTT-Minigame-Manager/blob/main/code/MinigameManager.cs)
+	//		- Enabled classes
 	//		- Cleanup	
-	//		- Player side
+	//		- active ability
 	//
 	//
 	//
 	internal partial class ClassHandler
     {
-		public static IList<TTT_Class> Registered_TTT_Classes { get; private set; } = new List<TTT_Class>();
+		public static IList<TTT_ClassHeader> Registered_TTT_Classes { get; private set; } = new List<TTT_ClassHeader>();
 
 		public static IList<TTT_Class> Enabled_TTT_Classes { get; private set; } = new List<TTT_Class>();
 
 
 		private static string Select_Random_Class_Name()
 		{
-			TTT_Class selected = null;
-			int AmountOfClasses = Enabled_TTT_Classes.Count;
+			TTT_ClassHeader selected = null;
+			int AmountOfClasses = Registered_TTT_Classes.Count;
 			int selection = Game.Random.Int( AmountOfClasses - 1 );
 			Log.Info( selection );
 			Log.Info( "------");
 			Log.Info( AmountOfClasses );
-			selected = Enabled_TTT_Classes[selection];
+			selected = Registered_TTT_Classes[selection];
 			return selected.Name;
 		}
 
@@ -82,38 +118,48 @@ namespace TCT_Classes
 
 		}
 
-		public static void RegisterClass( TTT_Class game )
+	//	public static void RegisterClass( TTT_Class game )
+	//	{
+	//		Log.Info( "Attempting to register : " + game.Name );
+	//		Registered_TTT_Classes.Add( game );
+	//		// This part of the code loads the previous config if it exists.
+	//		if ( Game.IsServer )
+	//		{
+	//			if ( FileSystem.Data.FileExists( "TTT_Classes_config.json" ) )
+	//			{
+	//				var config = FileSystem.Data.ReadJson<Dictionary<string, bool>>( "TTT_Classes_config.json" );
+	//				if ( !config.ContainsKey( game.Name ) )
+	//				{
+	//					Enabled_TTT_Classes.Add( game );
+	//					return;
+	//				}
+	//				if ( config[game.Name] )
+	//				{
+	//					Enabled_TTT_Classes.Add( game );
+	//					return;
+	//				}
+	//			}
+	//			else
+	//			{
+	//				Enabled_TTT_Classes.Add( game );
+	//			}
+	//		}
+	//	}
+		
+
+
+
+		internal static TTT_ClassHeader Convert_TTT_Class_2_Header(TypeDescription typeDescription)
 		{
-			Log.Info( "Attempting to register : " + game.Name );
-			Registered_TTT_Classes.Add( game );
-			// This part of the code loads the previous config if it exists.
-			if ( Game.IsServer )
-			{
-				if ( FileSystem.Data.FileExists( "TTT_Classes_config.json" ) )
-				{
-					var config = FileSystem.Data.ReadJson<Dictionary<string, bool>>( "TTT_Classes_config.json" );
-					if ( !config.ContainsKey( game.Name ) )
-					{
-						Enabled_TTT_Classes.Add( game );
-						return;
-					}
-					if ( config[game.Name] )
-					{
-						Enabled_TTT_Classes.Add( game );
-						return;
-					}
-				}
-				else
-				{
-					Enabled_TTT_Classes.Add( game );
-				}
-			}
+			TTT_Class temp = typeDescription.Create<TTT_Class>();
+			TTT_ClassHeader header = new TTT_ClassHeader(temp.Name, temp.Color, temp.Description, typeDescription);
+			return header;
 		}
 
 
-		public static TTT_Class FindClass(String name )
+		public static TTT_ClassHeader FindClass(String name )
 		{
-			foreach(TTT_Class C in Registered_TTT_Classes)
+			foreach( TTT_ClassHeader C in Registered_TTT_Classes)
 			{
 				if ( C.Name == name )
 				{
@@ -123,23 +169,23 @@ namespace TCT_Classes
 			return null;
 		}
 
-		[ClientRpc]
-		public static void AssignClass( string ClassToAssign, TerrorTown.Player Ply ) 
-		{ 
-			if(Game.LocalClient.Pawn == Ply )
-			{
-				Log.Info( "-------" );
-				Log.Info( "Correctly sent:" + ClassToAssign);
-				TTT_Class ClassToApply = FindClass(ClassToAssign);
-				Log.Info( "translated:" + ClassToApply.Name );
-				Log.Info( "-------" );
-			}
+		public static void AssignClass( string classToAssign, TerrorTown.Player ply ) 
+		{
+			Game.AssertServer();
+			
+			Log.Info( "-------" );
+			Log.Info( "Correctly sent:" + classToAssign );
+			TTT_ClassHeader classToApply = FindClass( classToAssign );
+			Log.Info( "translated:" + classToApply.Name );
+			ply.Components.Add( classToApply.TypeDescription.Create<TTT_Class>() );
+			Log.Info( ply );
+			Log.Info( ply.Components.Get<TTT_Class>() );
+			Log.Info( "-------" );
+			TTT_Class classOnPlayer = ply.Components.Get<TTT_Class>();
+			classOnPlayer.RoundStartAbility();
 
-			else
-			{
-				Log.Info( "Not For me :" + Ply.Name + ":" + ((TerrorTown.Player)Game.LocalClient.Pawn).Name );
-			}
-		
+
+
 		}
 
 
@@ -182,14 +228,15 @@ namespace TCT_Classes
 				Log.Error( "No classes were found." );
 				throw new Exception( "No classes were found." );
 			}
-			foreach ( TypeDescription TTTC in list )
-			{
-				if ( !Registered_TTT_Classes.Where( ( TTT_Class x ) => x.GetType() == TTTC.TargetType ).Any() )
-				{
-					TTTC.Create<TTT_Class>();
-				}
-			}
 
+			foreach ( TypeDescription type in list )
+			{
+				if ( !Registered_TTT_Classes.Where( ( TTT_ClassHeader x ) => x.TypeDescription.TargetType == type.TargetType ).Any() )
+				{
+					Registered_TTT_Classes.Add(Convert_TTT_Class_2_Header(type));
+				}
+
+			}
 		}
 
 	}
