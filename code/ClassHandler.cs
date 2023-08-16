@@ -42,16 +42,18 @@ namespace TCT_Classes
 		public abstract float Frequency { get; set; }
 		public abstract string Description { get; set; }
 
-		private RealTimeUntil AbilityCooldown;
+		public RealTimeUntil AbilityCooldown;
 
-		public bool HasActiveAbility = false;
-		public float CoolDownTimer;
+		public RealTimeUntil HoldButtonDown;
+		public virtual bool hasActiveAbility { get; set; } = false;
+		public virtual float coolDownTimer { get; set; } = 60f;
+		public virtual float buttonDownDuration { get; set; } = 1f;
 
 		//Run on Ability Trigger
-		public abstract void ActiveAbility();
+		public virtual void ActiveAbility() { }
 
 		//Run on start
-		public abstract void RoundStartAbility();
+		public virtual void RoundStartAbility() { }
 
 		protected TTT_Class()
 		{
@@ -94,14 +96,34 @@ namespace TCT_Classes
 				}
 			}
 		}
+
+		public void Startup()
+		{
+			RoundStartAbility();
+			if(hasActiveAbility)
+			{
+				AbilityCooldown = coolDownTimer;
+				HoldButtonDown = 0;
+			}
+		}
+
 		[GameEvent.Client.Frame]
 		protected void Look_For_Active_Button_Press()
 		{
-			if (Game.LocalClient.Pawn == Entity)
+			if (Game.LocalClient.Pawn == Entity && hasActiveAbility )
 			{
-				if ( Input.Down("Spray") )
+				if ( Input.Down("Spray") && AbilityCooldown )
 				{
-					Log.Info( "Active" );
+					if( Input.Pressed( "Spray" ) )
+					{
+						HoldButtonDown = 0;
+					}
+					if(HoldButtonDown > buttonDownDuration )
+					{
+						AbilityCooldown = coolDownTimer;
+						ActiveAbility();
+					}
+					
 				}
 			}
 		}
@@ -145,6 +167,14 @@ namespace TCT_Classes
 			throw new Exception("How Did you do this?  --- Random select not functioning");
 			
 		}
+
+		[ConCmd.Server( "TTT_Class_RunAblity_ConsoleCommand" )]
+		public static void RunActiveAbility( string clientName , string className)
+		{
+			
+		}
+
+
 
 
 		private static bool ValidateUser( TerrorTown.Player ply )
@@ -203,7 +233,7 @@ namespace TCT_Classes
 			Log.Info( ply.Components.Get<TTT_Class>() );
 			Log.Info( "-------" );
 			TTT_Class classOnPlayer = ply.Components.Get<TTT_Class>();
-			classOnPlayer.RoundStartAbility();
+			classOnPlayer.Startup();
 
 
 
