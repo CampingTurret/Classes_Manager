@@ -22,17 +22,20 @@
         }
 </style>
 
-    <div>
-        Hello! @Identifier
+<div style="color: @classColor.Hex; background-color: #a3a3a3; width: 300px; justify-content: center; border-top-left-radius: 12px; border-top-right-radius: 12px; white-space:nowrap">
+        @className
     </div>
 
 @code
 {
-    private int Identifier {get; set;}
+    private string className {get; set;}
 
-    public void Init(int id)
+    private Color classColor { get; set; }
+
+    public void Init(string classname, Color classcolor)
     {
-        Identifier = id;
+        className = classname;
+        classColor = classcolor;
     }
 
 }
