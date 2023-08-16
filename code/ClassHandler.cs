@@ -160,14 +160,7 @@ namespace TCT_Classes
 				return true;
 			}
 			return false;
-
-
-
-
-
 		}
-		
-
 
 
 		internal static TTT_ClassHeader Convert_TTT_Class_2_Header(TypeDescription typeDescription)
@@ -204,33 +197,62 @@ namespace TCT_Classes
 			Log.Info( "-------" );
 			TTT_Class classOnPlayer = ply.Components.Get<TTT_Class>();
 			classOnPlayer.RoundStartAbility();
-
-
-
 		}
 
 		[ConCmd.Client( "class_testing" )]
 		public static void test()
 		{
-			// insane line that deletes the previous attempt.
-			Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault().Children.Where( x => x.HasClass( "seg" ) ).FirstOrDefault().ChildrenOfType<ShowClass>().FirstOrDefault()?.Delete(); ;
-			foreach ( var panels in Game.RootPanel.Children )
+			foreach(var panel in Game.RootPanel.Children)
 			{
-				Log.Info( panels );
+				Log.Info( panel );
 			}
+		}
+
+		[ConCmd.Client( "class_add_class_ui" )]
+		public static void AddClassUI(string classname)
+		{
+			// This line removes the previous class if it exists
+			Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault().Children.Where( x => x.HasClass( "seg" ) ).FirstOrDefault().ChildrenOfType<UI.ShowClass>().FirstOrDefault()?.Delete();
+
+			// Finding the assigned class
+			TTT_ClassHeader class_header = FindClass( classname );
+			if ( class_header == null ) { Log.Error( "Could not find given class for UI update." ); return; }
+
+			// These lines alter the existing UI to accomedate our new element.
 			var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault();
-			//Log.Info( health );
-			////health.SetProperty( "style", "height:15vh" );
-			//foreach ( var child in health.Children )
-			//{
-			//	Log.Info( child );
-			//	Log.Info( "next" );
-			//}
 			var top_bar = health.Children.Where( x => x.HasClass( "seg" ) ).FirstOrDefault();
-			Log.Info( top_bar );
 			top_bar.SetProperty( "style", "flex-direction: column-reverse; height: 96px;" );
-			var panel = top_bar.AddChild<ShowClass>();
-			panel.Init( "TesterClass", new Color(255, 255, 0) );
+
+			// This adds our new element.
+			var panel = top_bar.AddChild<UI.ShowClass>();
+			panel.Init( class_header.Name, class_header.Color );
+		}
+
+		[ClientRpc]
+		public static void AnnounceClasses()
+		{
+			TTT_Class classOnPlayer = Game.LocalClient.Pawn.Components.Get<TTT_Class>();
+			if ( classOnPlayer == null )
+			{
+				Log.Error( "We don't have an assigned class!" );
+				return;
+			}
+			var announcement = Game.RootPanel.AddChild<UI.ClassAnnouncement>();
+			announcement.SetClass( classOnPlayer );
+		}
+
+		[TerrorTown.ChatCmd( "class_desc", PermissionLevel.User )]
+		public static void RequestDescription()
+		{
+			var attached_class = ConsoleSystem.Caller.Pawn.Components.Get<TTT_Class>();
+			if ( attached_class == null )
+			{
+				Chat.AddChatEntry( To.Single( (Entity)ConsoleSystem.Caller.Pawn ), null, "You don't have an assigned class!" );
+			}
+			else 
+			{
+				Chat.AddChatEntry( To.Single( (Entity)ConsoleSystem.Caller.Pawn ), null, attached_class.Description );
+			}
 		}
 
 		[Event( "Game.Round.Start" )]
@@ -238,22 +260,15 @@ namespace TCT_Classes
 		{
 			if ( Game.IsServer )
 			{
-
-
-
-				IList<TerrorTown.Player> Players = new List<TerrorTown.Player>();
 				foreach ( IClient client in Game.Clients )
 				{
-					Players.Add( (TerrorTown.Player)client.Pawn );
-				}
+					TerrorTown.Player ply = client.Pawn as TerrorTown.Player;
+					string assigned_class = Select_Random_Class_Name();
 
-
-				foreach ( TerrorTown.Player ply in Players )
-				{
-
-
-					AssignClass(Select_Random_Class_Name(), ply);
+					AssignClass(assigned_class, ply);
+					client.SendCommandToClient( "class_add_class_ui \"" + assigned_class + "\"" );
 				};
+				AnnounceClasses();
 			}
 
 		}
