@@ -136,7 +136,7 @@ namespace TCT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			((TerrorTown.WalkController)Entity.MovementController).SpeedMultiplier = 1.3f;
+			((TerrorTown.WalkController)Entity.MovementController).SpeedMultiplier = 1.5f;
 		}
 	}
 	

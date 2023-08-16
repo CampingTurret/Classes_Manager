@@ -209,7 +209,27 @@ namespace TCT_Classes
 
 		}
 
-
+		[ConCmd.Client( "class_testing" )]
+		public static void test()
+		{
+			//foreach ( var panel in Game.RootPanel.Children )
+			//{
+			//	Log.Info( panel );
+			//}
+			var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault();
+			Log.Info( health );
+			health.SetProperty( "style", "height:15vh" );
+			foreach(var child in health.Children)
+			{
+				Log.Info( child );
+				Log.Info( "next" );
+			}
+			var green_bar = health.Children.Where( x => x.HasClass( "bar" ) ).FirstOrDefault();
+			green_bar.SetProperty( "style", "");
+			Log.Info( health.Children.Where( x => x.HasClass( "bar" ) ).FirstOrDefault() );
+			var panel = health.AddChild<ShowClass>();
+			panel.Init( Game.Random.Int( 0, 10 ) );
+		}
 
 		[Event( "Game.Round.Start" )]
 		public static void OnRoundStart()

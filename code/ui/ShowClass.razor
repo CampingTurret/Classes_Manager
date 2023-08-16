@@ -1,0 +1,38 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using System.Collections.Generic;
+@using TerrorTown;
+@using System.Linq;
+@inherits Panel
+
+<style>
+    .hello
+        {
+            max-width: 100%;
+            padding: 10px;
+            margin: 10px;
+            min-height: 62px;
+            font-size: 32px;
+            border-radius: 4px;
+            text-shadow: 2px 2px 4px darkgray;
+            background-color: rgba(200, 200, 200, 0.65);
+            align-items: center;
+            justify-content: center;
+            border: 2px #333;
+        }
+</style>
+
+    <div>
+        Hello! @Identifier
+    </div>
+
+@code
+{
+    private int Identifier {get; set;}
+
+    public void Init(int id)
+    {
+        Identifier = id;
+    }
+
+}
