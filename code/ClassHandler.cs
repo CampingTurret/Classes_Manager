@@ -36,7 +36,7 @@ namespace TCT_Classes
 	public abstract class TTT_Class : EntityComponent<TerrorTown.Player>
 	{
 		
-		public abstract string Name { get; set; }
+		new public abstract string Name { get; set; }
 		public abstract Color Color { get; set; }
 
 		public abstract float Frequency { get; set; }
@@ -44,7 +44,7 @@ namespace TCT_Classes
 
 		public RealTimeUntil AbilityCooldown;
 
-		public RealTimeUntil HoldButtonDown;
+		public RealTimeSince HoldButtonDown;
 		public virtual bool hasActiveAbility { get; set; } = false;
 		public virtual float coolDownTimer { get; set; } = 60f;
 		public virtual float buttonDownDuration { get; set; } = 1f;
@@ -120,8 +120,10 @@ namespace TCT_Classes
 					}
 					if(HoldButtonDown > buttonDownDuration )
 					{
-						AbilityCooldown = coolDownTimer;
-						ActiveAbility();
+
+						ConsoleSystem.Run( "TTT_Class_RunAblity_ConsoleCommand", Name);
+						
+						
 					}
 					
 				}
@@ -136,10 +138,6 @@ namespace TCT_Classes
 	//		- UI
 	//		- Enabled classes
 	//		- Cleanup	
-	//		- active ability
-	//
-	//
-	//
 	internal partial class ClassHandler
     {
 		public static IList<TTT_ClassHeader> Registered_TTT_Classes { get; private set; } = new List<TTT_ClassHeader>();
@@ -169,13 +167,31 @@ namespace TCT_Classes
 		}
 
 		[ConCmd.Server( "TTT_Class_RunAblity_ConsoleCommand" )]
-		public static void RunActiveAbility( string clientName , string className)
+		public static void RunActiveAbility( string className)
 		{
-			
+			TerrorTown.Player commandCaller = (TerrorTown.Player)ConsoleSystem.Caller.Pawn;
+
+			TTT_Class assginedClass = null;
+			IEnumerable<TTT_Class> classesAssignedToCaller = commandCaller.Components.GetAll<TTT_Class>();
+			foreach(TTT_Class c in classesAssignedToCaller )
+			{
+				if(c.Name == className )
+				{
+					assginedClass = c;
+				}
+			}
+
+			if(assginedClass == null)
+			{
+				throw new Exception( "No matching class found on player:" + commandCaller.Name + ":" + className );
+			}
+
+			if ( assginedClass.AbilityCooldown )
+			{
+				assginedClass.AbilityCooldown = assginedClass.coolDownTimer;
+				assginedClass.ActiveAbility();
+			}
 		}
-
-
-
 
 		private static bool ValidateUser( TerrorTown.Player ply )
 		{
