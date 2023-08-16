@@ -7,8 +7,13 @@ using System.Threading.Tasks;
 using TerrorTown;
 using GoldDeagle;
 
+
+
 namespace TCT_Classes
 {
+
+
+	
 	public class Bountyhunter : TTT_Class
 	{
 
@@ -58,7 +63,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "DemolitionExpert";
 		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 1f;
+		public override float Frequency { get; set; } = 0.5f;
 		public override Color Color { get; set; }
 
 		public override void ActiveAbility()
@@ -69,8 +74,9 @@ namespace TCT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			Entity.Inventory.AddItem( new TerrorTown.C4() );
-			
+	
+			Add_Item_To_Player( new TerrorTown.C4() );
+
 		}
 	}
 	public class Magician : TTT_Class
@@ -89,8 +95,7 @@ namespace TCT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			Entity.Inventory.AddItem( new TerrorTown.Teleporter());
-			Entity.Inventory.AddItem( new TerrorTown.DeadRinger());
+			Add_Item_To_Player( new TerrorTown.Teleporter() );
 
 		}
 	}
@@ -110,7 +115,8 @@ namespace TCT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			Entity.Inventory.AddItem( new TerrorTown.Radar() );
+			Add_Item_To_Player( new TerrorTown.Radar() );
+
 
 		}
 	}
@@ -130,7 +136,8 @@ namespace TCT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			((TerrorTown.WalkController)Entity.MovementController).SpeedMultiplier = 1.5f;
+			((TerrorTown.WalkController)Entity.MovementController).SpeedMultiplier = 1.3f;
 		}
 	}
+	
 }

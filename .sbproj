@@ -1,8 +1,8 @@
 {
-  "Title": "TCT_Classes_Manager_TTT",
+  "Title": "Classes_Manager_TTT",
   "Type": "addon",
   "Org": "local",
-  "Ident": "tct_classes_manager_ttt",
+  "Ident": "classes_manager_ttt",
   "Tags": null,
   "Schema": 1,
   "HasAssets": true,
@@ -13,8 +13,7 @@
   "CodePath": "/code/",
   "PackageReferences": [
     "thieves.terrortown",
-    "thieves.golden_deagle",
-    "xenthio.dead_ringer"
+    "thieves.golden_deagle"
   ],
   "EditorReferences": null,
   "Metadata": {

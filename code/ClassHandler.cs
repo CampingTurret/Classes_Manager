@@ -35,7 +35,6 @@ namespace TCT_Classes
 
 	public abstract class TTT_Class : EntityComponent<TerrorTown.Player>
 	{
-
 		
 		public abstract string Name { get; set; }
 		public abstract Color Color { get; set; }
@@ -61,8 +60,18 @@ namespace TCT_Classes
 
 		protected void Add_Item_To_Player(ModelEntity item)
 		{
-			item.Position = Entity.Position;
-			
+			if(item is Carriable)
+			{
+				Log.Info("Adding :" + item.Name + ": to :" + Entity.Name);
+				Entity.Inventory.AddItem(item);
+				((Carriable)item).Droppable = false;
+				((Carriable)item).DropOnDeath = false;
+			}
+			else
+			{
+				Log.Info( "Spawning :" + item.Name + ": on :" + Entity.Name );
+				item.Position = Entity.Position;
+			}
 		}
 		protected void Add_Item_To_Player( TypeDescription item )
 		{
@@ -73,15 +82,28 @@ namespace TCT_Classes
 			}
 			else
 			{
-				spawned.Position = Entity.Position;
+				if ( spawned is Carriable )
+				{
+					Entity.Inventory.AddItem( spawned );
+					((Carriable)spawned).Droppable = false;
+					((Carriable)spawned).DropOnDeath = false;
+				}
+				else
+				{
+					spawned.Position = Entity.Position;
+				}
 			}
 		}
-
-
 		[GameEvent.Client.Frame]
 		protected void Look_For_Active_Button_Press()
 		{
-			
+			if (Game.LocalClient.Pawn == Entity)
+			{
+				if ( Input.Down("Spray") )
+				{
+					Log.Info( "Active" );
+				}
+			}
 		}
 
 
@@ -105,7 +127,6 @@ namespace TCT_Classes
 
 		private static string Select_Random_Class_Name()
 		{
-			TTT_ClassHeader selected = null;
 			int AmountOfClasses = Registered_TTT_Classes.Count;
 			float totalFrequency = Registered_TTT_Classes.Sum( x => x.Frequency );	
 			float selection = Game.Random.Float(totalFrequency);
