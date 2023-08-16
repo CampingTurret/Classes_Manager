@@ -50,9 +50,15 @@ namespace TCT_Classes
 		public virtual float buttonDownDuration { get; set; } = 1f;
 
 		//Run on Ability Trigger
+		/// <summary>
+		/// Add code that runs when the ability button is held down
+		/// </summary>
 		public virtual void ActiveAbility() { }
 
 		//Run on start
+		/// <summary>
+		/// Add code that runs when the the round starts
+		/// </summary>
 		public virtual void RoundStartAbility() { }
 
 		protected TTT_Class()
@@ -60,6 +66,9 @@ namespace TCT_Classes
 			//Touching this causes errors!
 		}
 
+		/// <summary>
+		/// Add a item to the player that owns this class
+		/// </summary>
 		protected void Add_Item_To_Player(ModelEntity item)
 		{
 			if(item is Carriable)
@@ -75,6 +84,9 @@ namespace TCT_Classes
 				item.Position = Entity.Position;
 			}
 		}
+		/// <summary>
+		/// Add a item to the player that owns this class
+		/// </summary>
 		protected void Add_Item_To_Player( TypeDescription item )
 		{
 			ModelEntity spawned = item.Create<ModelEntity>();
@@ -139,49 +151,47 @@ namespace TCT_Classes
 	//		- Enabled classes
 	//		- Cleanup	
 	internal partial class ClassHandler
-    {
+	{
 		public static IList<TTT_ClassHeader> Registered_TTT_Classes { get; private set; } = new List<TTT_ClassHeader>();
 
-		public static IList<TTT_Class> Enabled_TTT_Classes { get; private set; } = new List<TTT_Class>();
+		public static IEnumerable<TTT_ClassHeader> Enabled_TTT_Classes { get { return Registered_TTT_Classes.Where( x => x.Frequency > 0 ); } }
 
 
 		private static string Select_Random_Class_Name()
 		{
-			int AmountOfClasses = Registered_TTT_Classes.Count;
-			float totalFrequency = Registered_TTT_Classes.Sum( x => x.Frequency );	
-			float selection = Game.Random.Float(totalFrequency);
-			float frequencyTrack = 0 ;
-			foreach (TTT_ClassHeader header in Registered_TTT_Classes)
+			int AmountOfClasses = Enabled_TTT_Classes.Count();
+			float totalFrequency = Enabled_TTT_Classes.Sum( x => x.Frequency );
+			float selection = Game.Random.Float( totalFrequency );
+			float frequencyTrack = 0;
+			foreach ( TTT_ClassHeader header in Enabled_TTT_Classes )
 			{
 				frequencyTrack = frequencyTrack + header.Frequency;
 
-				if( frequencyTrack > selection )
+				if ( frequencyTrack > selection )
 				{
-					Log.Info( header.Name);
-					Log.Info( "------" );
 					return header.Name;
 				}
 			}
-			throw new Exception("How Did you do this?  --- Random select not functioning");
-			
+			throw new Exception( "How Did you do this?  --- Random select not functioning" );
+
 		}
 
 		[ConCmd.Server( "TTT_Class_RunAblity_ConsoleCommand" )]
-		public static void RunActiveAbility( string className)
+		public static void RunActiveAbility( string className )
 		{
 			TerrorTown.Player commandCaller = (TerrorTown.Player)ConsoleSystem.Caller.Pawn;
 
 			TTT_Class assginedClass = null;
 			IEnumerable<TTT_Class> classesAssignedToCaller = commandCaller.Components.GetAll<TTT_Class>();
-			foreach(TTT_Class c in classesAssignedToCaller )
+			foreach ( TTT_Class c in classesAssignedToCaller )
 			{
-				if(c.Name == className )
+				if ( c.Name == className )
 				{
 					assginedClass = c;
 				}
 			}
 
-			if(assginedClass == null)
+			if ( assginedClass == null )
 			{
 				throw new Exception( "No matching class found on player:" + commandCaller.Name + ":" + className );
 			}
@@ -209,17 +219,17 @@ namespace TCT_Classes
 		}
 
 
-		internal static TTT_ClassHeader Convert_TTT_Class_2_Header(TypeDescription typeDescription)
+		internal static TTT_ClassHeader Convert_TTT_Class_2_Header( TypeDescription typeDescription )
 		{
 			TTT_Class temp = typeDescription.Create<TTT_Class>();
-			TTT_ClassHeader header = new TTT_ClassHeader(temp.Name, temp.Color, temp.Description, typeDescription,temp.Frequency);
+			TTT_ClassHeader header = new TTT_ClassHeader( temp.Name, temp.Color, temp.Description, typeDescription, temp.Frequency );
 			return header;
 		}
 
 
-		public static TTT_ClassHeader FindClass(String name )
+		public static TTT_ClassHeader FindClass( String name )
 		{
-			foreach( TTT_ClassHeader C in Registered_TTT_Classes)
+			foreach ( TTT_ClassHeader C in Registered_TTT_Classes )
 			{
 				if ( C.Name == name )
 				{
@@ -229,10 +239,10 @@ namespace TCT_Classes
 			return null;
 		}
 
-		public static void AssignClass( string classToAssign, TerrorTown.Player ply ) 
+		public static void AssignClass( string classToAssign, TerrorTown.Player ply )
 		{
 			Game.AssertServer();
-			
+
 			Log.Info( "-------" );
 			Log.Info( "Correctly sent:" + classToAssign );
 			TTT_ClassHeader classToApply = FindClass( classToAssign );
@@ -244,6 +254,45 @@ namespace TCT_Classes
 			TTT_Class classOnPlayer = ply.Components.Get<TTT_Class>();
 			classOnPlayer.Startup();
 		}
+		public static void Save_Settings()
+		{
+			
+		}
+
+		public static void Load_Settings() 
+		{
+
+			Dictionary<string,float> classPairs = new Dictionary<string,float>();
+
+			
+		}
+
+		public static void Generate_Registered_Classes()
+		{
+
+			Registered_TTT_Classes.Clear();
+			List<TypeDescription> list = (from type in GlobalGameNamespace.TypeLibrary.GetTypes<TTT_Class>()
+										  where type.TargetType.IsSubclassOf( typeof( TTT_Class ) )
+										  select type).ToList();
+
+			Log.Info( list );
+			if ( list.Count() == 0 )
+			{
+				Log.Error( "No classes were found." );
+				throw new Exception( "No classes were found." );
+			}
+
+			foreach ( TypeDescription type in list )
+			{
+				if ( !Registered_TTT_Classes.Where( ( TTT_ClassHeader x ) => x.TypeDescription.TargetType == type.TargetType ).Any() )
+				{
+					Registered_TTT_Classes.Add( Convert_TTT_Class_2_Header( type ) );
+				}
+
+			}
+		}
+
+
 
 		[ConCmd.Client( "class_testing" )]
 		public static void test()
@@ -322,25 +371,9 @@ namespace TCT_Classes
 		[Event( "Game.Initialized" )]
 		public static void Initialise_TTT_Class( MyGame _game )
 		{
-			List<TypeDescription> list = (from type in GlobalGameNamespace.TypeLibrary.GetTypes<TTT_Class>()
-										  where type.TargetType.IsSubclassOf( typeof( TTT_Class ) )
-										  select type).ToList();
 
-			Log.Info( list );
-			if ( list.Count() == 0 )
-			{
-				Log.Error( "No classes were found." );
-				throw new Exception( "No classes were found." );
-			}
-
-			foreach ( TypeDescription type in list )
-			{
-				if ( !Registered_TTT_Classes.Where( ( TTT_ClassHeader x ) => x.TypeDescription.TargetType == type.TargetType ).Any() )
-				{
-					Registered_TTT_Classes.Add(Convert_TTT_Class_2_Header(type));
-				}
-
-			}
+			
+			Generate_Registered_Classes();
 		}
 
 	}

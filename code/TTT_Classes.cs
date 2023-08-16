@@ -108,11 +108,6 @@ namespace TCT_Classes
 		public override float Frequency { get; set; } = 0f;
 		public override Color Color { get; set; }
 
-		public override void ActiveAbility()
-		{
-
-		}
-
 		//Run on start
 		public override void RoundStartAbility()
 		{
@@ -122,7 +117,7 @@ namespace TCT_Classes
 	public class ActiveTest : TTT_Class
 	{
 
-		public override string Name { get; set; } = "Junkie";
+		public override string Name { get; set; } = "ActiveTest";
 		public override string Description { get; set; } = "Test";
 		public override float Frequency { get; set; } = 1f;
 		public override Color Color { get; set; }
@@ -136,10 +131,6 @@ namespace TCT_Classes
 			Log.Info( "Active" );
 		}
 
-		//Run on start
-		public override void RoundStartAbility()
-		{
-		}
 	}
 
 }
