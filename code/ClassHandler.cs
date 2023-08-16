@@ -36,22 +36,24 @@ namespace TCT_Classes
 	public abstract class TTT_Class : EntityComponent<TerrorTown.Player>
 	{
 		
-		public abstract string Name { get; set; }
+		new public abstract string Name { get; set; }
 		public abstract Color Color { get; set; }
 
 		public abstract float Frequency { get; set; }
 		public abstract string Description { get; set; }
 
-		private RealTimeUntil AbilityCooldown;
+		public RealTimeUntil AbilityCooldown;
 
-		public bool HasActiveAbility = false;
-		public float CoolDownTimer;
+		public RealTimeSince HoldButtonDown;
+		public virtual bool hasActiveAbility { get; set; } = false;
+		public virtual float coolDownTimer { get; set; } = 60f;
+		public virtual float buttonDownDuration { get; set; } = 1f;
 
 		//Run on Ability Trigger
-		public abstract void ActiveAbility();
+		public virtual void ActiveAbility() { }
 
 		//Run on start
-		public abstract void RoundStartAbility();
+		public virtual void RoundStartAbility() { }
 
 		protected TTT_Class()
 		{
@@ -94,14 +96,36 @@ namespace TCT_Classes
 				}
 			}
 		}
+
+		public void Startup()
+		{
+			RoundStartAbility();
+			if(hasActiveAbility)
+			{
+				AbilityCooldown = coolDownTimer;
+				HoldButtonDown = 0;
+			}
+		}
+
 		[GameEvent.Client.Frame]
 		protected void Look_For_Active_Button_Press()
 		{
-			if (Game.LocalClient.Pawn == Entity)
+			if (Game.LocalClient.Pawn == Entity && hasActiveAbility )
 			{
-				if ( Input.Down("Spray") )
+				if ( Input.Down("Spray") && AbilityCooldown )
 				{
-					Log.Info( "Active" );
+					if( Input.Pressed( "Spray" ) )
+					{
+						HoldButtonDown = 0;
+					}
+					if(HoldButtonDown > buttonDownDuration )
+					{
+
+						ConsoleSystem.Run( "TTT_Class_RunAblity_ConsoleCommand", Name);
+						
+						
+					}
+					
 				}
 			}
 		}
@@ -114,10 +138,6 @@ namespace TCT_Classes
 	//		- UI
 	//		- Enabled classes
 	//		- Cleanup	
-	//		- active ability
-	//
-	//
-	//
 	internal partial class ClassHandler
     {
 		public static IList<TTT_ClassHeader> Registered_TTT_Classes { get; private set; } = new List<TTT_ClassHeader>();
@@ -146,6 +166,32 @@ namespace TCT_Classes
 			
 		}
 
+		[ConCmd.Server( "TTT_Class_RunAblity_ConsoleCommand" )]
+		public static void RunActiveAbility( string className)
+		{
+			TerrorTown.Player commandCaller = (TerrorTown.Player)ConsoleSystem.Caller.Pawn;
+
+			TTT_Class assginedClass = null;
+			IEnumerable<TTT_Class> classesAssignedToCaller = commandCaller.Components.GetAll<TTT_Class>();
+			foreach(TTT_Class c in classesAssignedToCaller )
+			{
+				if(c.Name == className )
+				{
+					assginedClass = c;
+				}
+			}
+
+			if(assginedClass == null)
+			{
+				throw new Exception( "No matching class found on player:" + commandCaller.Name + ":" + className );
+			}
+
+			if ( assginedClass.AbilityCooldown )
+			{
+				assginedClass.AbilityCooldown = assginedClass.coolDownTimer;
+				assginedClass.ActiveAbility();
+			}
+		}
 
 		private static bool ValidateUser( TerrorTown.Player ply )
 		{
@@ -196,7 +242,7 @@ namespace TCT_Classes
 			Log.Info( ply.Components.Get<TTT_Class>() );
 			Log.Info( "-------" );
 			TTT_Class classOnPlayer = ply.Components.Get<TTT_Class>();
-			classOnPlayer.RoundStartAbility();
+			classOnPlayer.Startup();
 		}
 
 		[ConCmd.Client( "class_testing" )]
