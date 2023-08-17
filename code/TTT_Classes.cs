@@ -133,4 +133,52 @@ namespace TCT_Classes
 
 	}
 
+	public class FartClass : TTT_Class
+	{
+
+		public override string Name { get; set; } = "Gassy";
+		public override string Description { get; set; } = "You're gassy! You can use your active to fart and push other players around.";
+		public override float Frequency { get; set; } = 1f;
+		public override Color Color { get; set; } = new Color( 0, 50, 0 );
+
+		public override bool hasActiveAbility { get; set; } = true;
+		public override float coolDownTimer { get; set; } = 20f;
+		public override float buttonDownDuration { get; set; } = 1f;
+
+		private string fartsound = Cloud.SoundEvent( "smartmario.smallfart" ).ResourceName;
+
+		private SoundEvent fart { get; set; }
+		private Particles Particle { get; set; }
+
+		public override void RoundStartAbility()
+		{
+			base.RoundStartAbility();
+			fart = Cloud.SoundEvent( "smartmario.smallfart" );
+			fart.Create();
+		}
+		public override void ActiveAbility()
+		{
+			// Following code inspired by the implementation of the discombobulator in TTT by Three Thieves
+			Particle = Particles.Create( "particles/discombob_bomb.vpcf" );
+			Particle.SetPosition( 0, Entity.Position );
+			ParticleCleanupSystem.RegisterForCleanup( Particle );
+
+			
+			Entity.PlaySound( fartsound );
+			foreach ( Entity item in Sandbox.Entity.FindInSphere( Entity.Position, 200f ) )
+			{
+				if ( item == Entity ) { continue; }
+				Vector3 normal = (item.Position - Entity.Position).Normal;
+				normal.z = Math.Abs( normal.z ) + 1f;
+				item.Velocity += normal * 256f;
+				ModelEntity modelEntity = item as ModelEntity;
+				if ( modelEntity != null )
+				{
+					modelEntity.PhysicsBody.Velocity += normal * 50f;
+				}
+
+			}
+
+		}
+	}
 }

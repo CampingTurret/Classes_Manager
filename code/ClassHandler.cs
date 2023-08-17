@@ -114,7 +114,6 @@ namespace TCT_Classes
 			RoundStartAbility();
 			if(hasActiveAbility)
 			{
-				AbilityCooldown = coolDownTimer;
 				HoldButtonDown = 0;
 			}
 		}
