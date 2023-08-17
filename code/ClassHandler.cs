@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sandbox;
 using TerrorTown;
+using System.Xml.Linq;
 
 namespace TCT_Classes
 {
@@ -37,14 +38,15 @@ namespace TCT_Classes
 	{
 		
 		new public abstract string Name { get; set; }
-		public abstract Color Color { get; set; }
-
+		public virtual Color Color { get; set; } = new Color(0.1f,0.1f,0.1f);
+		
 		public abstract float Frequency { get; set; }
 		public abstract string Description { get; set; }
 
 		public RealTimeUntil AbilityCooldown;
 
 		public RealTimeSince HoldButtonDown;
+		private RealTimeSince lastServerCall;
 		public virtual bool hasActiveAbility { get; set; } = false;
 		public virtual float coolDownTimer { get; set; } = 60f;
 		public virtual float buttonDownDuration { get; set; } = 1f;
@@ -122,20 +124,26 @@ namespace TCT_Classes
 		{
 			if (Game.LocalClient.Pawn == Entity && hasActiveAbility )
 			{
-				if ( Input.Down("Spray") && AbilityCooldown )
+				if ( AbilityCooldown )
 				{
-					if( Input.Pressed( "Spray" ) )
+					if ( Input.Down( "Spray" ))
 					{
-						HoldButtonDown = 0;
-					}
-					if(HoldButtonDown > buttonDownDuration )
-					{
+						if ( Input.Pressed( "Spray" ) )
+						{
+							HoldButtonDown = 0;
+						}
+						if ( HoldButtonDown > buttonDownDuration )
+						{
+							if ( lastServerCall > 0.1 )
+							{
+								ConsoleSystem.Run( "TTT_Class_RunAblity_ConsoleCommand", Name );
+								lastServerCall = 0;
+							}
 
-						ConsoleSystem.Run( "TTT_Class_RunAblity_ConsoleCommand", Name);
-						
-						
+
+						}
+
 					}
-					
 				}
 			}
 		}
@@ -199,7 +207,12 @@ namespace TCT_Classes
 			if ( assginedClass.AbilityCooldown )
 			{
 				assginedClass.AbilityCooldown = assginedClass.coolDownTimer;
+				assginedClass.HoldButtonDown = 0;
 				assginedClass.ActiveAbility();
+			}
+			else
+			{
+				Log.Info( "No" );
 			}
 		}
 
@@ -273,28 +286,32 @@ namespace TCT_Classes
 		[ConCmd.Server( "TTT_Class_Load_config" )]
 		public static void Load_Settings() 
 		{
-			if(!FileSystem.Data.FileExists( "TTT_Class_settings.json" ) )
+			if ( Game.IsServer )
 			{
-				return;
-			}
-			string settings = FileSystem.Data.ReadAllText( "TTT_Class_settings.json" );
-
-
-		
-			Dictionary<string, float> classPairs = Json.Deserialize<Dictionary<string, float>>( settings);
-			foreach (TTT_ClassHeader header in Registered_TTT_Classes )
-			{
-				bool exists = classPairs.TryGetValue( header.Name, out float freqtoadd );
-
-				if ( exists )
+				Game.AssertServer();
+				if ( !FileSystem.Data.FileExists( "TTT_Class_settings.json" ) )
 				{
-					header.Frequency = freqtoadd;	
+					return;
 				}
+				string settings = FileSystem.Data.ReadAllText( "TTT_Class_settings.json" );
+
+
+
+				Dictionary<string, float> classPairs = Json.Deserialize<Dictionary<string, float>>( settings );
+				foreach ( TTT_ClassHeader header in Registered_TTT_Classes )
+				{
+					bool exists = classPairs.TryGetValue( header.Name, out float freqtoadd );
+
+					if ( exists )
+					{
+						header.Frequency = freqtoadd;
+					}
+				}
+
+			
 			}
 			
 		}
-
-
 		public static void Generate_Registered_Classes()
 		{
 
@@ -415,6 +432,8 @@ namespace TCT_Classes
 
 			
 			Generate_Registered_Classes();
+			ConsoleSystem.Run( "TTT_Class_Load_config" );
+
 		}
 
 	}
