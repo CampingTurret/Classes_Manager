@@ -34,7 +34,7 @@ namespace TCT_Classes
 
 	}
 
-	public abstract class TTT_Class : EntityComponent<TerrorTown.Player>
+	public abstract partial class TTT_Class : EntityComponent<TerrorTown.Player>
 	{
 		
 		new public abstract string Name { get; set; }
@@ -119,14 +119,14 @@ namespace TCT_Classes
 			}
 		}
 
-		[GameEvent.Client.Frame]
+		[GameEvent.Tick.Client]
 		protected void Look_For_Active_Button_Press()
 		{
-			if (Game.LocalClient.Pawn == Entity && hasActiveAbility )
+			if ( Game.LocalClient.Pawn == Entity && hasActiveAbility )
 			{
 				if ( AbilityCooldown )
 				{
-					if ( Input.Down( "Spray" ))
+					if ( Input.Down( "Spray" ) )
 					{
 						if ( Input.Pressed( "Spray" ) )
 						{
@@ -139,12 +139,18 @@ namespace TCT_Classes
 								ConsoleSystem.Run( "TTT_Class_RunAblity_ConsoleCommand", Name );
 								lastServerCall = 0;
 							}
-
-
 						}
-
 					}
 				}
+			}
+		}
+
+		[ClientRpc]
+		public void SetCooldown(IClient target)
+		{
+			if (Game.LocalClient == target)
+			{
+				AbilityCooldown = coolDownTimer;
 			}
 		}
 
@@ -209,6 +215,7 @@ namespace TCT_Classes
 				assginedClass.AbilityCooldown = assginedClass.coolDownTimer;
 				assginedClass.HoldButtonDown = 0;
 				assginedClass.ActiveAbility();
+				assginedClass.SetCooldown( ConsoleSystem.Caller );
 			}
 			else
 			{
