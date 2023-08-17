@@ -449,6 +449,20 @@ namespace TCT_Classes
 			ConsoleSystem.Caller.SendCommandToClient( "class_toggle_ui" );
 		}
 
+		[GameEvent.Server.ClientJoined]
+		public static void OnJoin( ClientJoinedEvent _e )
+		{
+			Dictionary<string, float> classPairs = new Dictionary<string, float>();
+
+			foreach ( TTT_ClassHeader header in Registered_TTT_Classes )
+			{
+				classPairs.Add( header.Name, header.Frequency );
+			}
+
+			string settings = Json.Serialize( classPairs );
+			Event.Run( "class_full_sync", settings );
+		}
+
 		[TerrorTown.ChatCmd( "class_desc", PermissionLevel.User )]
 		public static void RequestDescription()
 		{
