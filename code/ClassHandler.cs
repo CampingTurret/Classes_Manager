@@ -255,6 +255,22 @@ namespace TCT_Classes
 			classOnPlayer.Startup();
 		}
 
+		[ConCmd.Client( "class_toggle_ui" )]
+		public static void ToggleUI()
+		{
+			Game.AssertClient();
+			var panel = Game.RootPanel.ChildrenOfType<UI.ClassSelectorUI>().FirstOrDefault();
+			if ( panel == null )
+			{
+				var newpanel = Game.RootPanel.AddChild<UI.ClassSelectorUI>();
+				newpanel.SetLocalClassList( Registered_TTT_Classes );
+			}
+			else
+			{
+				panel.Delete();
+			}
+		}
+
 		[ConCmd.Server( "TTT_Class_save_config" )]
 		public static void Save_Settings()
 		{
@@ -268,6 +284,7 @@ namespace TCT_Classes
 
 			string settings = Json.Serialize( classPairs );
 			FileSystem.Data.WriteAllText( "TTT_Class_settings.json", settings );
+			Event.Run( "class_full_sync", settings );
 
 		}
 		[ConCmd.Server( "TTT_Class_Load_config" )]
@@ -291,7 +308,7 @@ namespace TCT_Classes
 					header.Frequency = freqtoadd;	
 				}
 			}
-			
+			Event.Run( "class_full_sync", settings );
 		}
 
 
@@ -320,7 +337,9 @@ namespace TCT_Classes
 
 			}
 		}
-		[ConCmd.Client ( "TTT_Class_Get_Class_Chance" )]
+
+
+		[ConCmd.Client( "TTT_Class_Get_Class_Chance" )]
 		public static float Get_Class_Chance( string className )
 		{
 
@@ -335,12 +354,24 @@ namespace TCT_Classes
 
 		}
 
-		[ConCmd.Client( "class_testing" )]
+		[ConCmd.Server("class_set_frequency")]
+		public static void SetFrequency(string className, float frequency )
+		{
+			if ( !ValidateUser( ConsoleSystem.Caller.Pawn as TerrorTown.Player ) ) { Log.Error( "Insufficient permissions" ); return; }
+			var ttt_class = FindClass( className );
+			if ( ttt_class == null ) { Log.Error( className + " was not found on this server." ); return; }
+			ttt_class.Frequency = Math.Clamp(frequency, -1, 1);
+		}
+
+		[ConCmd.Server( "class_testing" )]
 		public static void test()
 		{
-			foreach(var panel in Game.RootPanel.Children)
+			Log.Info( "Running" );
+			foreach(var classses in Registered_TTT_Classes)
 			{
-				Log.Info( panel );
+				Log.Info( classses.Name );
+				Log.Info( classses.Frequency );
+				Log.Info(' ');
 			}
 		}
 
@@ -375,6 +406,33 @@ namespace TCT_Classes
 			}
 			var announcement = Game.RootPanel.AddChild<UI.ClassAnnouncement>();
 			announcement.SetClass( classOnPlayer );
+		}
+
+		[Event( "class_full_sync" )]
+		[ClientRpc]
+		public static void FullClientSync( string classJson )
+		{
+			var classPairs = Json.Deserialize<Dictionary<string, float>>( classJson );
+
+			foreach ( TTT_ClassHeader header in Registered_TTT_Classes )
+			{
+				if ( classPairs.TryGetValue( header.Name, out float freqtoadd ) )
+				{
+					header.Frequency = freqtoadd;
+				}
+			}
+		}
+
+		[TerrorTown.ChatCmd( "classes", PermissionLevel.Moderator )]
+		public static void OpenUIChat1()
+		{
+			ConsoleSystem.Caller.SendCommandToClient( "class_toggle_ui" );
+		}
+
+		[TerrorTown.ChatCmd( "class", PermissionLevel.Moderator )]
+		public static void OpenUIChat2()
+		{
+			ConsoleSystem.Caller.SendCommandToClient( "class_toggle_ui" );
 		}
 
 		[TerrorTown.ChatCmd( "class_desc", PermissionLevel.User )]
@@ -412,9 +470,8 @@ namespace TCT_Classes
 		[Event( "Game.Initialized" )]
 		public static void Initialise_TTT_Class( MyGame _game )
 		{
-
-			
 			Generate_Registered_Classes();
+			Load_Settings();
 		}
 
 	}
