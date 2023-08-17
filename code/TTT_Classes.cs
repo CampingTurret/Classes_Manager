@@ -88,7 +88,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "WallHack";
 		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } =1f;
+		public override float Frequency { get; set; } =0f;
 		public override Color Color { get; set; }
 
 
@@ -119,7 +119,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "ActiveTest";
 		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 0f;
+		public override float Frequency { get; set; } = 1f;
 		public override Color Color { get; set; }
 
 		public override bool hasActiveAbility { get; set; } = true;
