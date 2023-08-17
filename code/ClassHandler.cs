@@ -73,15 +73,13 @@ namespace TCT_Classes
 		{
 			if(item is Carriable)
 			{
-				Log.Info("Adding :" + item.Name + ": to :" + Entity.Name);
 				Entity.Inventory.AddItem(item);
 				((Carriable)item).Droppable = false;
 				((Carriable)item).DropOnDeath = false;
 			}
 			else
 			{
-				Log.Info( "Spawning :" + item.Name + ": on :" + Entity.Name );
-				item.Position = Entity.Position;
+				item.Touch( Entity );
 			}
 		}
 		/// <summary>
@@ -104,7 +102,7 @@ namespace TCT_Classes
 				}
 				else
 				{
-					spawned.Position = Entity.Position;
+					spawned.Touch( Entity );
 				}
 			}
 		}
@@ -163,10 +161,12 @@ namespace TCT_Classes
 			float totalFrequency = Enabled_TTT_Classes.Sum( x => x.Frequency );
 			float selection = Game.Random.Float( totalFrequency );
 			float frequencyTrack = 0;
+			Log.Info( Enabled_TTT_Classes );
+			Log.Info( Registered_TTT_Classes );
 			foreach ( TTT_ClassHeader header in Enabled_TTT_Classes )
 			{
 				frequencyTrack = frequencyTrack + header.Frequency;
-
+				Log.Info( "Helo" );
 				if ( frequencyTrack > selection )
 				{
 					return header.Name;
@@ -254,9 +254,11 @@ namespace TCT_Classes
 			TTT_Class classOnPlayer = ply.Components.Get<TTT_Class>();
 			classOnPlayer.Startup();
 		}
+
+		[ConCmd.Server( "TTT_Class_save_config" )]
 		public static void Save_Settings()
 		{
-
+			if ( !ValidateUser( ConsoleSystem.Caller.Pawn as TerrorTown.Player ) ) { Log.Error( "Insufficient permissions" ); return; }
 			Dictionary<string, float> classPairs = new Dictionary<string, float>();
 
 			foreach ( TTT_ClassHeader header in Registered_TTT_Classes )
@@ -264,20 +266,23 @@ namespace TCT_Classes
 				classPairs.Add( header.Name, header.Frequency );
 			}
 
-			//to do: save to file
+			string settings = Json.Serialize( classPairs );
+			FileSystem.Data.WriteAllText( "TTT_Class_settings.json", settings );
 
 		}
-
+		[ConCmd.Server( "TTT_Class_Load_config" )]
 		public static void Load_Settings() 
 		{
+			if(!FileSystem.Data.FileExists( "TTT_Class_settings.json" ) )
+			{
+				return;
+			}
+			string settings = FileSystem.Data.ReadAllText( "TTT_Class_settings.json" );
 
 
-			//to do: load from file
-
-
-			Dictionary<string,float> classPairs = new Dictionary<string,float>();
-
-			foreach(TTT_ClassHeader header in Registered_TTT_Classes )
+		
+			Dictionary<string, float> classPairs = Json.Deserialize<Dictionary<string, float>>( settings);
+			foreach (TTT_ClassHeader header in Registered_TTT_Classes )
 			{
 				bool exists = classPairs.TryGetValue( header.Name, out float freqtoadd );
 
@@ -294,6 +299,7 @@ namespace TCT_Classes
 		{
 
 			Registered_TTT_Classes.Clear();
+			Registered_TTT_Classes = new List<TTT_ClassHeader>();
 			List<TypeDescription> list = (from type in GlobalGameNamespace.TypeLibrary.GetTypes<TTT_Class>()
 										  where type.TargetType.IsSubclassOf( typeof( TTT_Class ) )
 										  select type).ToList();
@@ -314,25 +320,18 @@ namespace TCT_Classes
 
 			}
 		}
-
-		[ConCmd.Server( "TTT_Class_Get_Class_Chance" )]
+		[ConCmd.Client ( "TTT_Class_Get_Class_Chance" )]
 		public static float Get_Class_Chance( string className )
 		{
-			TerrorTown.Player commandCaller = (TerrorTown.Player)ConsoleSystem.Caller.Pawn;
 
-		
-			foreach ( TTT_ClassHeader c in Enabled_TTT_Classes)
-			{
-				if ( c.Name == className )
-				{
-					float freq = c.Frequency;
-					float TotalFreq = Enabled_TTT_Classes.Sum( x => x.Frequency );
+			TTT_ClassHeader c = FindClass( className );
+			
+			float freq = c.Frequency;
+			float TotalFreq = Enabled_TTT_Classes.Sum( x => x.Frequency );
 
-					return freq / TotalFreq;
-				}
-			}
-
-			throw new Exception( "No matching class found:" + commandCaller.Name + ":" + className );
+			return (float) (freq / TotalFreq);
+				
+			
 
 		}
 

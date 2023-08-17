@@ -19,7 +19,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "Bountyhunter";
 		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 9.5f;
+		public override float Frequency { get; set; } = 0f;
 
 		public override Color Color { get; set; }
 
@@ -38,7 +38,7 @@ namespace TCT_Classes
 		public override string Name { get; set; } = "Visionary";
 		public override string Description { get; set; } = "Test";
 
-		public override float Frequency { get; set; } = 0.5f;
+		public override float Frequency { get; set; } = 0f;
 		public override Color Color { get; set; }
 
 
@@ -55,7 +55,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "DemolitionExpert";
 		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 0.5f;
+		public override float Frequency { get; set; } = 0f;
 		public override Color Color { get; set; }
 
 
@@ -72,7 +72,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "Magician";
 		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 0.5f;
+		public override float Frequency { get; set; } = 0f;
 		public override Color Color { get; set; }
 
 
@@ -88,7 +88,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "WallHack";
 		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 0.5f;
+		public override float Frequency { get; set; } =1f;
 		public override Color Color { get; set; }
 
 
@@ -105,7 +105,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "Junkie";
 		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 0.5f;
+		public override float Frequency { get; set; } = 0f;
 		public override Color Color { get; set; }
 
 		//Run on start
@@ -119,7 +119,7 @@ namespace TCT_Classes
 
 		public override string Name { get; set; } = "ActiveTest";
 		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 0.5f;
+		public override float Frequency { get; set; } = 0f;
 		public override Color Color { get; set; }
 
 		public override bool hasActiveAbility { get; set; } = true;
