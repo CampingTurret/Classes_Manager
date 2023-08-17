@@ -256,16 +256,39 @@ namespace TCT_Classes
 		}
 		public static void Save_Settings()
 		{
-			
+
+			Dictionary<string, float> classPairs = new Dictionary<string, float>();
+
+			foreach ( TTT_ClassHeader header in Registered_TTT_Classes )
+			{
+				classPairs.Add( header.Name, header.Frequency );
+			}
+
+			//to do: save to file
+
 		}
 
 		public static void Load_Settings() 
 		{
 
+
+			//to do: load from file
+
+
 			Dictionary<string,float> classPairs = new Dictionary<string,float>();
 
+			foreach(TTT_ClassHeader header in Registered_TTT_Classes )
+			{
+				bool exists = classPairs.TryGetValue( header.Name, out float freqtoadd );
+
+				if ( exists )
+				{
+					header.Frequency = freqtoadd;	
+				}
+			}
 			
 		}
+
 
 		public static void Generate_Registered_Classes()
 		{
@@ -292,7 +315,26 @@ namespace TCT_Classes
 			}
 		}
 
+		[ConCmd.Server( "TTT_Class_Get_Class_Chance" )]
+		public static float Get_Class_Chance( string className )
+		{
+			TerrorTown.Player commandCaller = (TerrorTown.Player)ConsoleSystem.Caller.Pawn;
 
+		
+			foreach ( TTT_ClassHeader c in Enabled_TTT_Classes)
+			{
+				if ( c.Name == className )
+				{
+					float freq = c.Frequency;
+					float TotalFreq = Enabled_TTT_Classes.Sum( x => x.Frequency );
+
+					return freq / TotalFreq;
+				}
+			}
+
+			throw new Exception( "No matching class found:" + commandCaller.Name + ":" + className );
+
+		}
 
 		[ConCmd.Client( "class_testing" )]
 		public static void test()
