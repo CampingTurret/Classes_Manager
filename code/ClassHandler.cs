@@ -149,10 +149,10 @@ namespace TCT_Classes
 				{
 					if ( Input.Down( "Spray" ) )
 					{
-						if ( Input.Pressed( "Spray" ) )
-						{
-							HoldButtonDown = 0;
-						}
+						//if ( Input.Pressed( "Spray" ) )
+						//{
+						//	HoldButtonDown = 0;
+						//}
 						if ( HoldButtonDown > buttonDownDuration )
 						{
 							if ( lastServerCall > 0.1 )
@@ -161,8 +161,10 @@ namespace TCT_Classes
 								lastServerCall = 0;
 							}
 						}
+						return;
 					}
 				}
+				HoldButtonDown = 0;
 			}
 		}
 
@@ -408,9 +410,13 @@ namespace TCT_Classes
 		[ConCmd.Client( "class_testing" )]
 		public static void test()
 		{
-			foreach(var panel in Game.RootPanel.ChildrenOfType<Health>().FirstOrDefault().Children)
+			foreach(var panel in Game.RootPanel.Children)
 			{
 				Log.Info( panel );
+			}
+			foreach(var panel2 in Game.RootPanel.ChildrenOfType<Health>().FirstOrDefault().Children)
+			{
+				Log.Info( panel2 );
 			}
 		}
 
@@ -433,9 +439,11 @@ namespace TCT_Classes
 			// This adds our new element.
 			var panel = top_bar.AddChild<UI.ShowClass>();
 			panel.Init( class_header.Name, class_header.Color );
+			Game.RootPanel.ChildrenOfType<Chat>().FirstOrDefault()?.SetProperty( "style", "bottom:196px;" );
 			if ( class_header.hasActiveAbility )
 			{
 				Game.RootPanel.AddChild<UI.ActiveCooldown>();
+				Game.RootPanel.ChildrenOfType<Chat>().FirstOrDefault()?.SetProperty( "style", "bottom:256px;" );
 			}
 		}
 

@@ -10,7 +10,7 @@
 <style>
     .hello {
         position: absolute;
-        height: 62px;
+        height: 48px;
         width: 300px;
         left: 32px;
         bottom: 198px;
@@ -23,9 +23,8 @@
     }
 
     .progressbarbg {
-        border: 3px #333 solid;
-        
-        font-size: 30px;
+        border: 0.5px solid rgba(128,128,128,0.16) font-size: 30px;
+        box-shadow: 0px 0px 24px rgba(0,0,0,0.4); 
         width: 100%;
         max-height: 100%;
         min-height: 100%;
@@ -34,8 +33,11 @@
     }
 
     .progress {
-        min-height: 100%;
-        background-color: #4CAF50;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: #33D733;
     }
 
     .progress-text {
@@ -49,7 +51,6 @@
         left: 0;
         width: 100%;
         height: 100%;
-        margin-top: -3px;
     }
 
 </style>
@@ -57,8 +58,8 @@
 <div class="hello">
     <div class="progressbarbg">
 
-        <div class="progress" style="width: @(widthcalc)%">
-        </div>
+        <div class="progress" style="width: @(widthcalc)%"></div>
+        <div class="progress" style="width: @(pushbutton)%; background-color:rgba(0,50, 200, 0.4)"></div>
         <div class="progress-text">@("Active (" + Input.GetButtonOrigin("Spray") + ")")</div>
     </div>
     </div>
@@ -70,7 +71,9 @@
 
     private Color classColor { get; set; }
 
-    private double widthcalc {get; set;}
+    private double widthcalc {get; set; }
+
+    private double pushbutton { get; set; }
 
     public void Init(string classname, Color classcolor)
     {
@@ -84,6 +87,14 @@
         if (player_class == null)
         {
             Log.Error("Have active cooldown, but couldn't find player class!");
+        }
+        if (Input.Down("Spray"))
+        {
+            pushbutton = (player_class.HoldButtonDown.Relative / player_class.buttonDownDuration) * 100;
+        }
+        else
+        {
+            pushbutton = 0;
         }
         widthcalc = (player_class.AbilityCooldown.Fraction * 100);
         return Sandbox.Time.Now.GetHashCode();

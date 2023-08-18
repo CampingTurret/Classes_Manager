@@ -123,7 +123,7 @@ namespace TCT_Classes
 		public override Color Color { get; set; }
 
 		public override bool hasActiveAbility { get; set; } = true;
-		public override float coolDownTimer { get; set; } = 60f;
+		public override float coolDownTimer { get; set; } = 15f;
 		public override float buttonDownDuration { get; set; } = 2f;
 
 		public override void ActiveAbility()
@@ -150,7 +150,7 @@ namespace TCT_Classes
 
 		public override bool hasActiveAbility { get; set; } = true;
 		public override float coolDownTimer { get; set; } = 20f;
-		public override float buttonDownDuration { get; set; } = 1f;
+		public override float buttonDownDuration { get; set; } = 0f;
 
 		private string fartsound ;
 
