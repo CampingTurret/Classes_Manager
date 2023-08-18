@@ -34,11 +34,12 @@
     }
 
     .bg {
+        position: absolute;
         background-color: rgba(100, 100, 100, 0.65);
         width: 75vw;
-        height: 70vh;
-        margin-left: 5vw;
-        margin-top: 15vh;
+        height: 65vh;
+        left: 5vw;
+        top: 10vh;
         display: flex;          
         flex-direction: column;
         overflow: hidden;
@@ -261,7 +262,6 @@
     private void ToggleClass()
     {
         ActiveClass.Frequency = -ActiveClass.Frequency;
-        Log.Info(ActiveClass.Frequency);
         ConsoleSystem.Run("class_set_frequency", ActiveClass.Name, ActiveClass.Frequency);
     }
 

@@ -18,10 +18,10 @@ namespace TCT_Classes
 	{
 
 		public override string Name { get; set; } = "Bountyhunter";
-		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 0f;
+		public override string Description { get; set; } = "You've got a gun with the bad guys' name on it. You start with a Golden Deagle.";
+		public override float Frequency { get; set; } = 1f;
 
-		public override Color Color { get; set; }
+		public override Color Color { get; set; } = Color.FromRgb( 0xd4af37 );
 
 
 
@@ -36,10 +36,10 @@ namespace TCT_Classes
 	{
 
 		public override string Name { get; set; } = "Visionary";
-		public override string Description { get; set; } = "You can see the dead's final moments";
+		public override string Description { get; set; } = "You can see the dead's final moments. You start with a Visualiser.";
 
-		public override float Frequency { get; set; } = 0f;
-		public override Color Color { get; set; }
+		public override float Frequency { get; set; } = 1f;
+		public override Color Color { get; set; } = Color.FromRgb( 0x82f1f5 );
 
 
 		//Run on start
@@ -54,9 +54,9 @@ namespace TCT_Classes
 	{
 
 		public override string Name { get; set; } = "DemolitionExpert";
-		public override string Description { get; set; } = "Time to blow it all up";
-		public override float Frequency { get; set; } = 0f;
-		public override Color Color { get; set; }
+		public override string Description { get; set; } = "Time to blow it all up! You start with a C4.";
+		public override float Frequency { get; set; } = 0.5f;
+		public override Color Color { get; set; } = Color.FromRgb(0x8c8f9c);
 
 
 		//Run on start
@@ -71,9 +71,9 @@ namespace TCT_Classes
 	{
 
 		public override string Name { get; set; } = "Magician";
-		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 0f;
-		public override Color Color { get; set; }
+		public override string Description { get; set; } = "Now you see me, now you don't... You start with a teleporter.";
+		public override float Frequency { get; set; } = 1f;
+		public override Color Color { get; set; } = Color.FromRgb( 0xbc3ddb );
 
 
 		//Run on start
@@ -86,27 +86,25 @@ namespace TCT_Classes
 	public class WallHack : TTT_Class
 	{
 
-		public override string Name { get; set; } = "WallHack";
-		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } =0f;
-		public override Color Color { get; set; }
+		public override string Name { get; set; } = "WallHacker";
+		public override string Description { get; set; } = "0PP0n3n7s: L0c47ED! You start with a radar.";
+		public override float Frequency { get; set; } = 1f;
+		public override Color Color { get; set; } = Color.Red.Darken( 0.25f );
 
 
 		//Run on start
 		public override void RoundStartAbility()
 		{
 			Add_Item_To_Player( new TerrorTown.Radar() );
-
-
 		}
 	}
 	public class Junkie : TTT_Class
 	{
 
 		public override string Name { get; set; } = "Junkie";
-		public override string Description { get; set; } = "Test";
-		public override float Frequency { get; set; } = 0f;
-		public override Color Color { get; set; }
+		public override string Description { get; set; } = "You took a hit of the good stuff, now you run 50% faster!";
+		public override float Frequency { get; set; } = 1f;
+		public override Color Color { get; set; } = Color.Yellow;
 
 		//Run on start
 		public override void RoundStartAbility()
@@ -118,9 +116,9 @@ namespace TCT_Classes
 	{
 
 		public override string Name { get; set; } = "Hunter";
-		public override string Description { get; set; } = "Test";
+		public override string Description { get; set; } = "After stalking it's prey, the hunter pounces! You can use your active ability to launch yourself forward.";
 		public override float Frequency { get; set; } = 1f;
-		public override Color Color { get; set; }
+		public override Color Color { get; set; } = Color.FromRgb( 0x80461B );
 
 		public override bool hasActiveAbility { get; set; } = true;
 		public override float coolDownTimer { get; set; } = 15f;
@@ -144,9 +142,9 @@ namespace TCT_Classes
 	{
 
 		public override string Name { get; set; } = "Gassy";
-		public override string Description { get; set; } = "You're gassy! You can use your active to fart and push other players around.";
-		public override float Frequency { get; set; } = 0f;
-		public override Color Color { get; set; } = new Color( 0, 50, 0 );
+		public override string Description { get; set; } = "You're gassy! You can use your active ability to fart and push other players around.";
+		public override float Frequency { get; set; } = 1f;
+		public override Color Color { get; set; } = new Color( 0, 0.75f, 0 );
 
 		public override bool hasActiveAbility { get; set; } = true;
 		public override float coolDownTimer { get; set; } = 20f;

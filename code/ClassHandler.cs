@@ -149,10 +149,6 @@ namespace TCT_Classes
 				{
 					if ( Input.Down( "Spray" ) )
 					{
-						//if ( Input.Pressed( "Spray" ) )
-						//{
-						//	HoldButtonDown = 0;
-						//}
 						if ( HoldButtonDown > buttonDownDuration )
 						{
 							if ( lastServerCall > 0.1 )
