@@ -1,0 +1,91 @@
+﻿@using Sandbox;
+@using Sandbox.UI;
+@using System.Collections.Generic;
+@using TerrorTown;
+@using System.Linq;
+@inherits Panel
+
+@namespace TCT_Classes.UI
+
+<style>
+    .hello {
+        position: absolute;
+        height: 62px;
+        width: 300px;
+        left: 32px;
+        bottom: 198px;
+        font-size: 32px;
+        border-radius: 12px;
+        text-shadow: 2px 2px 4px darkgray;
+        background-color: rgba(16,16,16,0.4);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .progressbarbg {
+        border: 3px #333 solid;
+        
+        font-size: 30px;
+        width: 100%;
+        max-height: 100%;
+        min-height: 100%;
+        overflow: hidden;
+        border-radius: 12px;
+    }
+
+    .progress {
+        min-height: 100%;
+        background-color: #4CAF50;
+    }
+
+    .progress-text {
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+        font-family: Poppins-SemiBold;
+        font-weight: 800;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        margin-top: -3px;
+    }
+
+</style>
+
+<div class="hello">
+    <div class="progressbarbg">
+
+        <div class="progress" style="width: @(widthcalc)%">
+        </div>
+        <div class="progress-text">@("Active (" + Input.GetButtonOrigin("Spray") + ")")</div>
+    </div>
+    </div>
+</div>
+
+@code
+{
+    private string className { get; set; }
+
+    private Color classColor { get; set; }
+
+    private double widthcalc {get; set;}
+
+    public void Init(string classname, Color classcolor)
+    {
+        className = classname;
+        classColor = classcolor;
+    }
+
+    protected override int BuildHash()
+    {
+        var player_class = Game.LocalPawn.Components.Get<TTT_Class>();
+        if (player_class == null)
+        {
+            Log.Error("Have active cooldown, but couldn't find player class!");
+        }
+        widthcalc = (player_class.AbilityCooldown.Fraction * 100);
+        return Sandbox.Time.Now.GetHashCode();
+    }
+}

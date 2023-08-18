@@ -24,14 +24,16 @@ namespace TCT_Classes
 		public TypeDescription TypeDescription { get; set; }
 
 		public float Frequency { get; set; }
-		public TTT_ClassHeader(string name, Color color, string description, TypeDescription typeDescription, float frequency) 
+
+		public bool hasActiveAbility { get; set; }
+		public TTT_ClassHeader(string name, Color color, string description, TypeDescription typeDescription, float frequency, bool hasactiveAbility) 
 		{
 			Name = name;
 			Description = description;
 			Color = color;
 			TypeDescription = typeDescription;
 			Frequency = Math.Clamp( frequency, 0f, 1f );
-			
+			hasActiveAbility = hasactiveAbility;
 		}
 
 	}
@@ -261,7 +263,7 @@ namespace TCT_Classes
 		internal static TTT_ClassHeader Convert_TTT_Class_2_Header( TypeDescription typeDescription )
 		{
 			TTT_Class temp = typeDescription.Create<TTT_Class>();
-			TTT_ClassHeader header = new TTT_ClassHeader( temp.Name, temp.Color, temp.Description, typeDescription, temp.Frequency );
+			TTT_ClassHeader header = new TTT_ClassHeader( temp.Name, temp.Color, temp.Description, typeDescription, temp.Frequency, temp.hasActiveAbility );
 			return header;
 		}
 
@@ -403,11 +405,13 @@ namespace TCT_Classes
 			ttt_class.Frequency = Math.Clamp(frequency, -1, 1);
 		}
 
-		[ConCmd.Server( "class_testing" )]
+		[ConCmd.Client( "class_testing" )]
 		public static void test()
 		{
-			var menu = Game.Menu;
-			Log.Info( menu );
+			foreach(var panel in Game.RootPanel.ChildrenOfType<Health>().FirstOrDefault().Children)
+			{
+				Log.Info( panel );
+			}
 		}
 
 
@@ -429,6 +433,10 @@ namespace TCT_Classes
 			// This adds our new element.
 			var panel = top_bar.AddChild<UI.ShowClass>();
 			panel.Init( class_header.Name, class_header.Color );
+			if ( class_header.hasActiveAbility )
+			{
+				Game.RootPanel.AddChild<UI.ActiveCooldown>();
+			}
 		}
 
 		[ClientRpc]
