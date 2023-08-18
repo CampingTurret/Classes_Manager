@@ -1,4 +1,4 @@
-﻿using Sandbox.Internal;
+using Sandbox.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +10,13 @@ using System.Xml.Linq;
 using TerrorTown.GameMenu;
 using Sandbox.UI.GameMenu;
 using Sandbox.Engine;
+using System.ComponentModel;
 
 namespace TCT_Classes
 {
-
 	public class TTT_ClassHeader: BaseNetworkable
 	{
 		public string Name;
-
 		public string Description { get; set; }
 
 		public Color Color { get; set; }
@@ -62,7 +61,7 @@ namespace TCT_Classes
 
 		//Run on start
 		/// <summary>
-		/// Add code that runs when the the round starts
+		/// Add code that runs when the round starts
 		/// </summary>
 		public virtual void RoundStartAbility() { }
 
@@ -112,6 +111,24 @@ namespace TCT_Classes
 			}
 		}
 
+		/// <summary>
+		/// Converts html hex color codes to Colors
+		/// </summary>
+		protected Color Hex_To_Color(string html_color_code)
+		{
+			if ( html_color_code.Length != 7 )
+			{
+				throw new ArgumentException( " Hex_To_Color: no hex color code provided" );
+			}
+			if ( !html_color_code.StartsWith( "#" ))
+			{
+				throw new ArgumentException( " Hex_To_Color: no hex color code provided" );
+			}
+			float r = Int32.Parse(  html_color_code.Substring(1,2), System.Globalization.NumberStyles.HexNumber ) /255f;
+			float g = Int32.Parse( html_color_code.Substring( 3, 2 ), System.Globalization.NumberStyles.HexNumber )/255f;
+			float b = Int32.Parse( html_color_code.Substring( 5, 2 ), System.Globalization.NumberStyles.HexNumber )/255f;
+			return new Color(r,g,b); 
+		}
 		public void Startup()
 		{
 			RoundStartAbility();
@@ -153,6 +170,7 @@ namespace TCT_Classes
 			if (Game.LocalClient == target)
 			{
 				AbilityCooldown = coolDownTimer;
+				HoldButtonDown = 0;
 			}
 		}
 
@@ -161,8 +179,7 @@ namespace TCT_Classes
 
 	// To Do:
 	//
-	//		- UI
-	//		- Enabled classes
+	//		- Active ability UI
 	//		- Cleanup	
 	internal partial class ClassHandler
 	{
