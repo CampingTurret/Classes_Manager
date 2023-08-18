@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using Sandbox;
 using TerrorTown;
 using System.Xml.Linq;
+using TerrorTown.GameMenu;
+using Sandbox.UI.GameMenu;
+using Sandbox.Engine;
 
 namespace TCT_Classes
 {
@@ -386,14 +389,10 @@ namespace TCT_Classes
 		[ConCmd.Server( "class_testing" )]
 		public static void test()
 		{
-			Log.Info( "Running" );
-			foreach(var classses in Registered_TTT_Classes)
-			{
-				Log.Info( classses.Name );
-				Log.Info( classses.Frequency );
-				Log.Info(' ');
-			}
+			var menu = Game.Menu;
+			Log.Info( menu );
 		}
+
 
 		[ConCmd.Client( "class_add_class_ui" )]
 		public static void AddClassUI(string classname)

@@ -144,18 +144,8 @@ namespace TCT_Classes
 		public override bool hasActiveAbility { get; set; } = true;
 		public override float coolDownTimer { get; set; } = 20f;
 		public override float buttonDownDuration { get; set; } = 1f;
-
-		private string fartsound = Cloud.SoundEvent( "smartmario.smallfart" ).ResourceName;
-
-		private SoundEvent fart { get; set; }
 		private Particles Particle { get; set; }
 
-		public override void RoundStartAbility()
-		{
-			base.RoundStartAbility();
-			fart = Cloud.SoundEvent( "smartmario.smallfart" );
-			fart.Create();
-		}
 		public override void ActiveAbility()
 		{
 			// Following code inspired by the implementation of the discombobulator in TTT by Three Thieves
@@ -164,7 +154,7 @@ namespace TCT_Classes
 			ParticleCleanupSystem.RegisterForCleanup( Particle );
 
 			
-			Entity.PlaySound( fartsound );
+			Entity.PlaySound( "mgfart" );
 			foreach ( Entity item in Sandbox.Entity.FindInSphere( Entity.Position, 200f ) )
 			{
 				if ( item == Entity ) { continue; }
