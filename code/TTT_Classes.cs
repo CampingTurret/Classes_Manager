@@ -1,4 +1,5 @@
 ﻿using Sandbox;
+using Sandbox.Component;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,8 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerrorTown;
 using GoldDeagle;
-
-
+using Sandbox.Physics;
 
 namespace TCT_Classes
 {
@@ -122,7 +122,7 @@ namespace TCT_Classes
 
 		public override bool hasActiveAbility { get; set; } = true;
 		public override float coolDownTimer { get; set; } = 15f;
-		public override float buttonDownDuration { get; set; } = 2f;
+		public override float buttonDownDuration { get; set; } = 1.5f;
 
 		public override void ActiveAbility()
 		{
@@ -133,8 +133,6 @@ namespace TCT_Classes
 		{
 			Entity.Components.RemoveAny<TerrorTown.FallDamageComponent>();
 		}
-
-
 	}
 
 
@@ -188,4 +186,145 @@ namespace TCT_Classes
 		}
 	}
 
+	public class Miniman : TTT_Class
+	{
+		public override string Name { get; set; } = "Miniman";
+		public override string Description { get; set; } = "You're small and vulnerable, but fast!";
+		public override float Frequency { get; set; } = 1f;
+		public override Color Color { get; set; } = Color.FromRgb( 0xf5d4a9 );
+
+		//Run on start
+		public override void RoundStartAbility()
+		{
+			((TerrorTown.WalkController)Entity.MovementController).SpeedMultiplier = 3f;
+			Entity.LocalScale = 0.5f;
+		}
+
+		[GameEvent.Tick.Server]
+		public void Tick()
+		{
+			if ( Entity.Health > 70 ) Entity.Health = 70;
+		}
+	}
+
+	public class Bigifier : TTT_Class
+	{   
+		public override string Name { get; set; } = "Mermaid Man";
+		public override string Description { get; set; } = "Set to W for Wumbo! Aim your laser at someone and make them grow temporarily by holding your active ability button!";
+		public override float Frequency { get; set; } = 1f;
+		public override Color Color { get; set; } = Color.FromRgb( 0x8ca6c6 );
+
+		public override bool hasActiveAbility { get; set; } = true;
+		public override float coolDownTimer { get; set; } = 45f;
+		public override float buttonDownDuration { get; set; } = 3f;
+
+		private RealTimeSince grow { get; set; }
+
+		private TerrorTown.Player grown_person { get; set; }
+
+		private ModelEntity glowingEntity = null;
+
+		private void RemoveGlowing()
+		{
+			glowingEntity?.Components.RemoveAny<Glow>();
+			if ( glowingEntity != null )
+			{
+				foreach ( var child in glowingEntity.Children )
+				{
+					var ent = child as ModelEntity;
+					if ( ent == null ) continue;
+					ent?.Components?.RemoveAny<Glow>();
+				}
+			}
+		}
+
+		public override void ActiveAbility()
+		{
+			if ( glowingEntity == null )
+			{
+				var glowRay = Entity.AimRay;
+				var glowTrace = Trace.Ray( glowRay, 300f );
+				glowTrace = glowTrace.DynamicOnly();
+				var tr = glowTrace.Ignore(Entity).Run();
+				if ( tr.Entity is TerrorTown.Player modelEntity )
+				{
+					if ( modelEntity != Entity && modelEntity.IsValid() )
+					{
+						glowingEntity = modelEntity;
+					}
+				}
+			}
+
+			var ply = glowingEntity as TerrorTown.Player;
+			if ( ply == null ) { Log.Info("Player didn't hit anyone!"); return; }
+			ply.LocalScale += 0.5f;
+			ply.PlaySound( "grow" );
+			grown_person = ply;
+			grow = 0;
+			RemoveGlowing();
+			glowingEntity = null;
+		}
+
+		[GameEvent.Tick.Server]
+		public void ServerTick()
+		{
+			if (grown_person != null)
+			{
+				if (grow > 30)
+				{
+					grown_person.LocalScale -= 0.5f;
+					grown_person.PlaySound( "shrink" );
+					grown_person = null;
+				}
+			}
+		}
+
+		[GameEvent.Tick.Client]
+		public void ClientTick()
+		{
+			if (Entity == Game.LocalPawn && Input.Down("Spray"))
+			{
+				var glowRay = Entity.AimRay;
+				var glowTrace = Trace.Ray( glowRay, 300f );
+				glowTrace = glowTrace.DynamicOnly();
+				var tr = glowTrace.Ignore(Entity).Run();
+
+				bool glowFound = false;
+
+				if ( tr.Entity is TerrorTown.Player modelEntity )
+				{
+					if ( modelEntity != Entity && modelEntity.IsValid() )
+					{
+						if ( modelEntity != glowingEntity )
+						{
+							Glow glowComponent = new() { Color = Color.Green, ObscuredColor = Color.Green };
+							modelEntity.Components.Add( glowComponent );
+							foreach ( var child in modelEntity.Children )
+							{
+								var ent = child as ModelEntity;
+								if ( ent == null ) continue;
+								ent.Components.Add( new Glow() { Color = Color.Green, ObscuredColor = Color.Green } );
+							}
+							RemoveGlowing();
+							glowingEntity = modelEntity;
+						}
+						glowFound = true;
+					}
+				}
+				if ( !glowFound && glowingEntity != null )
+				{
+					RemoveGlowing();
+					glowingEntity = null;
+				}
+			}
+			if (Input.Released("Spray"))
+			{
+				if ( glowingEntity != null )
+				{
+					RemoveGlowing();
+					glowingEntity = null;
+				}
+			}
+		}
+	}
 }

@@ -42,7 +42,7 @@ namespace TCT_Classes
 	{
 		
 		new public abstract string Name { get; set; }
-		public virtual Color Color { get; set; } = new Color(0.1f,0.1f,0.1f);
+		public virtual Color Color { get; set; } = new Color(0.2f,0.2f,0.2f);
 		
 		public abstract float Frequency { get; set; }
 		public abstract string Description { get; set; }
@@ -421,7 +421,7 @@ namespace TCT_Classes
 		public static void AddClassUI(string classname)
 		{
 			// This line removes the previous class if it exists
-			Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault().Children.Where( x => x.HasClass( "seg" ) ).FirstOrDefault().ChildrenOfType<UI.ShowClass>().FirstOrDefault()?.Delete();
+			Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault().Children.Where( x => x.HasClass( "seg" ) ).FirstOrDefault()?.ChildrenOfType<UI.ShowClass>().FirstOrDefault()?.Delete();
 
 			// Finding the assigned class
 			TTT_ClassHeader class_header = FindClass( classname );
