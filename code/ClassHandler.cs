@@ -176,15 +176,11 @@ namespace TTT_Classes
 
 
 	}
-
-	// To Do:
-	//
-	//		- Active ability UI
-	//		- Cleanup	
 	internal partial class ClassHandler
 	{
 		public static IList<TTT_ClassHeader> Registered_TTT_Classes { get; private set; } = new List<TTT_ClassHeader>();
 
+		// Classes are disabled when they have less than 0 frequency. By saving it this way we can remember both whether a class is enabled and it's frequency in a single float.
 		public static IEnumerable<TTT_ClassHeader> Enabled_TTT_Classes { get { return Registered_TTT_Classes.Where( x => x.Frequency > 0 ); } }
 
 
