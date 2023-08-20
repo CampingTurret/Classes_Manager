@@ -153,7 +153,7 @@ namespace TCT_Classes
 						{
 							if ( lastServerCall > 0.1 )
 							{
-								ConsoleSystem.Run( "TTT_Class_RunAblity_ConsoleCommand", Name );
+								ConsoleSystem.Run( "class_runablity_consolecommand", Name );
 								lastServerCall = 0;
 							}
 						}
@@ -209,7 +209,7 @@ namespace TCT_Classes
 
 		}
 
-		[ConCmd.Server( "TTT_Class_RunAblity_ConsoleCommand" )]
+		[ConCmd.Server( "class_runablity_consolecommand" )]
 		public static void RunActiveAbility( string className )
 		{
 			TerrorTown.Player commandCaller = (TerrorTown.Player)ConsoleSystem.Caller.Pawn;
@@ -310,7 +310,7 @@ namespace TCT_Classes
 			}
 		}
 
-		[ConCmd.Server( "TTT_Class_save_config" )]
+		[ConCmd.Server( "class_save_config" )]
 		public static void Save_Settings()
 		{
 			if ( !ValidateUser( ConsoleSystem.Caller.Pawn as TerrorTown.Player ) ) { Log.Error( "Insufficient permissions" ); return; }
@@ -326,7 +326,7 @@ namespace TCT_Classes
 			Event.Run( "class_full_sync", settings );
 
 		}
-		[ConCmd.Server( "TTT_Class_Load_config" )]
+		[ConCmd.Server( "class_load_config" )]
 		public static void Load_Settings() 
 		{
 			if ( Game.IsServer )
@@ -379,7 +379,7 @@ namespace TCT_Classes
 		}
 
 
-		[ConCmd.Client( "TTT_Class_Get_Class_Chance" )]
+		[ConCmd.Client( "class_get_class_chance" )]
 		public static float Get_Class_Chance( string className )
 		{
 
@@ -430,7 +430,6 @@ namespace TCT_Classes
 
 			// These lines alter the existing UI to accomedate our new element.
 			var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault();
-			//var top_bar = health.Children.Where( x => x.HasClass( "seg" ) ).FirstOrDefault();
 			health?.SetProperty( "style", "border-radius: 0px; border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;" );
 
 			// This adds our new element.
