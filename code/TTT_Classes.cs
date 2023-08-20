@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using TerrorTown;
 using GoldDeagle;
 using Sandbox.Physics;
-
-namespace TCT_Classes
+using SmartMario1_Items;
+namespace TTT_Classes
 {
 
 
@@ -232,7 +232,7 @@ namespace TCT_Classes
 		public override void RoundStartAbility()
 		{
 			base.RoundStartAbility();
-			Add_Item_To_Player(new GrapplingHook());
+			Add_Item_To_Player(new SmartMario1_Items.GrapplingHook());
 			Entity.Components.RemoveAny<TerrorTown.FallDamageComponent>();
 		}
 	}

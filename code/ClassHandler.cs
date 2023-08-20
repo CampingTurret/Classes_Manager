@@ -12,7 +12,7 @@ using Sandbox.UI.GameMenu;
 using Sandbox.Engine;
 using System.ComponentModel;
 
-namespace TCT_Classes
+namespace TTT_Classes
 {
 	public class TTT_ClassHeader: BaseNetworkable
 	{
