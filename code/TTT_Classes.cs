@@ -9,7 +9,7 @@ using TerrorTown;
 using GoldDeagle;
 using Sandbox.Physics;
 using SmartMario1_Items;
-namespace TCT_Classes
+namespace TTT_Classes
 {
 
 
