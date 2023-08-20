@@ -413,6 +413,7 @@ namespace TCT_Classes
 			foreach(var panel2 in Game.RootPanel.ChildrenOfType<Health>().FirstOrDefault().Children)
 			{
 				Log.Info( panel2 );
+				Log.Info( "bu" );
 			}
 		}
 
@@ -429,11 +430,11 @@ namespace TCT_Classes
 
 			// These lines alter the existing UI to accomedate our new element.
 			var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault();
-			var top_bar = health.Children.Where( x => x.HasClass( "seg" ) ).FirstOrDefault();
-			top_bar.SetProperty( "style", "flex-direction: column-reverse; height: 96px;" );
+			//var top_bar = health.Children.Where( x => x.HasClass( "seg" ) ).FirstOrDefault();
+			health?.SetProperty( "style", "border-radius: 0px; border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;" );
 
 			// This adds our new element.
-			var panel = top_bar.AddChild<UI.ShowClass>();
+			var panel = Game.RootPanel.AddChild<UI.ShowClass>();
 			panel.Init( class_header.Name, class_header.Color );
 			Game.RootPanel.ChildrenOfType<Chat>().FirstOrDefault()?.SetProperty( "style", "bottom:196px;" );
 			if ( class_header.hasActiveAbility )

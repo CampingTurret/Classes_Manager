@@ -10,21 +10,28 @@
 <style>
     .hello
         {
-            max-width: 100%;
-            padding: 10px;
-            margin: 10px;
-            min-height: 62px;
-            font-size: 32px;
-            border-radius: 4px;
-            text-shadow: 2px 2px 4px darkgray;
-            background-color: rgba(200, 200, 200, 0.65);
-            align-items: center;
-            justify-content: center;
-            border: 2px #333;
-        }
+        position: absolute;
+        color: @classColor.Hex;
+        background-color: rgba(183, 183, 183, 0.8);
+        width: 300px;
+        justify-content: center;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        white-space: nowrap;
+        left: 33px;
+        bottom: 130px;
+        height: 48px;
+        border: 0.5px solid rgba(128,128,128,0.16);
+        font-size: 30px;
+        box-shadow: 0px 0px 24px rgba(0,0,0,0.4);
+        text-transform: uppercase;
+        text-stroke: 4px rgb(32,32,32);
+        font-family: Poppins-SemiBold;
+        font-weight: 800;
+    }
 </style>
 
-<div style="color: @classColor.Hex; background-color: #a3a3a3; width: 300px; justify-content: center; border-top-left-radius: 12px; border-top-right-radius: 12px; white-space:nowrap">
+<div class="hello">
         @className
     </div>
 

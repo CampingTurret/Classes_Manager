@@ -207,6 +207,36 @@ namespace TCT_Classes
 		}
 	}
 
+	public class BoringClass : TTT_Class
+	{
+		public override string Name { get; set; } = "Mr. Responsible";
+		public override string Description { get; set; } = "You're a boring person who brought body armor to the fight.";
+		public override float Frequency { get; set; } = 0.8f;
+		public override Color Color { get; set; } = Color.FromRgb( 0x4A412A );
+
+		//Run on start
+		public override void RoundStartAbility()
+		{
+			Add_Item_To_Player( new BodyArmour());
+		}
+	}
+
+	public class Spiderman : TTT_Class
+	{
+		public override string Name { get; set; } = "Spiderman";
+		public override string Description { get; set; } = "Pizzatime! You have a grappling hook.";
+		public override float Frequency { get; set; } = 1f;
+		public override Color Color { get; set; } = Color.FromRgb( 0xa71814 );
+
+		//Run on start
+		public override void RoundStartAbility()
+		{
+			base.RoundStartAbility();
+			Add_Item_To_Player(new GrapplingHook());
+			Entity.Components.RemoveAny<TerrorTown.FallDamageComponent>();
+		}
+	}
+
 	public class Bigifier : TTT_Class
 	{   
 		public override string Name { get; set; } = "Mermaid Man";
@@ -282,6 +312,7 @@ namespace TCT_Classes
 		[GameEvent.Tick.Client]
 		public void ClientTick()
 		{
+			// This block of code represents a targeting system, useful for when you don't want your player to miss an active ability with a target.
 			if (Entity == Game.LocalPawn && Input.Down("Spray"))
 			{
 				var glowRay = Entity.AimRay;

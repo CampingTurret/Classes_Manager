@@ -1,6 +1,7 @@
 ﻿@using Sandbox;
 @using Sandbox.UI;
 @using System.Collections.Generic;
+@using System
 @using TerrorTown;
 @using System.Linq;
 @inherits Panel
@@ -90,13 +91,13 @@
         }
         if (Input.Down("Spray"))
         {
-            pushbutton = (player_class.HoldButtonDown.Relative / player_class.buttonDownDuration) * 100;
+            pushbutton = Math.Clamp((player_class.HoldButtonDown.Relative / player_class.buttonDownDuration) * 100, 0, 100);
         }
         else
         {
             pushbutton = 0;
         }
-        widthcalc = (player_class.AbilityCooldown.Fraction * 100);
-        return Sandbox.Time.Now.GetHashCode();
+        widthcalc = Math.Clamp((player_class.AbilityCooldown.Fraction * 100), 0, 100);
+        return HashCode.Combine(pushbutton, widthcalc);
     }
 }
