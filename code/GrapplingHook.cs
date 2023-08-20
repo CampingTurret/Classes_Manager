@@ -41,7 +41,6 @@ namespace SmartMario1_Items
 
 					if ( !tr.Hit ) return;
 					hookPos = tr.EndPosition;
-					Log.Info( tr.Entity );
 					var localOrigin1 = tr.Body.Transform.PointToLocal( hookPos );
 
 					rope = Particles.Create( "particles/rope.vpcf" );
