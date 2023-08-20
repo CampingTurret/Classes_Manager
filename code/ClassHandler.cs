@@ -278,14 +278,14 @@ namespace TTT_Classes
 		{
 			Game.AssertServer();
 
-			Log.Info( "-------" );
-			Log.Info( "Correctly sent:" + classToAssign );
+			//Log.Info( "-------" );
+			//Log.Info( "Correctly sent:" + classToAssign );
 			TTT_ClassHeader classToApply = FindClass( classToAssign );
-			Log.Info( "translated:" + classToApply.Name );
+			//Log.Info( "translated:" + classToApply.Name );
 			ply.Components.Add( classToApply.TypeDescription.Create<TTT_Class>() );
-			Log.Info( ply );
-			Log.Info( ply.Components.Get<TTT_Class>() );
-			Log.Info( "-------" );
+			//Log.Info( ply );
+			//Log.Info( ply.Components.Get<TTT_Class>() );
+			//Log.Info( "-------" );
 			TTT_Class classOnPlayer = ply.Components.Get<TTT_Class>();
 			classOnPlayer.Startup();
 		}
@@ -399,19 +399,19 @@ namespace TTT_Classes
 			ttt_class.Frequency = Math.Clamp(frequency, -1, 1);
 		}
 
-		[ConCmd.Client( "class_testing" )]
-		public static void test()
-		{
-			foreach(var panel in Game.RootPanel.Children)
-			{
-				Log.Info( panel );
-			}
-			foreach(var panel2 in Game.RootPanel.ChildrenOfType<Health>().FirstOrDefault().Children)
-			{
-				Log.Info( panel2 );
-				Log.Info( "bu" );
-			}
-		}
+		//[ConCmd.Client( "class_testing" )]
+		//public static void test()
+		//{
+		//	foreach(var panel in Game.RootPanel.Children)
+		//	{
+		//		Log.Info( panel );
+		//	}
+		//	foreach(var panel2 in Game.RootPanel.ChildrenOfType<Health>().FirstOrDefault().Children)
+		//	{
+		//		Log.Info( panel2 );
+		//		Log.Info( "bu" );
+		//	}
+		//}
 
 
 		[ConCmd.Client( "class_add_class_ui" )]
