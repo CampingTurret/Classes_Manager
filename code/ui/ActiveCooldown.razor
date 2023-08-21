@@ -21,6 +21,7 @@
         background-color: rgba(16,16,16,0.4);
         align-items: center;
         justify-content: center;
+        display: @visibility;
     }
 
     .progressbarbg {
@@ -76,10 +77,15 @@
 
     private double pushbutton { get; set; }
 
-    public void Init(string classname, Color classcolor)
+    private string visibility { get; set; } = "flex";
+
+    public void DisableActiveUI()
     {
-        className = classname;
-        classColor = classcolor;
+        visibility = "none";
+    }
+    public void EnableActiveUI()
+    {
+        visibility = "flex";
     }
 
     protected override int BuildHash()
@@ -98,6 +104,6 @@
             pushbutton = 0;
         }
         widthcalc = Math.Clamp((player_class.AbilityCooldown.Fraction * 100), 0, 100);
-        return HashCode.Combine(pushbutton, widthcalc);
+        return HashCode.Combine(pushbutton, widthcalc, visibility);
     }
 }

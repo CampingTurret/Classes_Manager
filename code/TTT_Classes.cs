@@ -126,6 +126,7 @@ namespace TTT_Classes
 
 		public override void ActiveAbility()
 		{
+			base.ActiveAbility();
 			Entity.Position += new Vector3(0,0,1);
 			Entity.Velocity += Entity.AimRay.Forward.Normal *800f;
 		}
@@ -162,6 +163,7 @@ namespace TTT_Classes
 	}
 		public override void ActiveAbility()
 		{
+			base.ActiveAbility();
 			// Following code inspired by the implementation of the discombobulator in TTT by Three Thieves
 			Particle = Particles.Create( "particles/discombob_bomb.vpcf" );
 			Particle.SetPosition( 0, Entity.Position );
@@ -270,6 +272,7 @@ namespace TTT_Classes
 
 		public override void ActiveAbility()
 		{
+			base.ActiveAbility();
 			if ( glowingEntity == null )
 			{
 				var glowRay = Entity.AimRay;

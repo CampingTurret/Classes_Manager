@@ -11,6 +11,7 @@ using TerrorTown.GameMenu;
 using Sandbox.UI.GameMenu;
 using Sandbox.Engine;
 using System.ComponentModel;
+using TTT_Classes.UI;
 
 namespace TTT_Classes
 {
@@ -59,7 +60,7 @@ namespace TTT_Classes
 		/// <summary>
 		/// Add code that runs when the ability button is held down
 		/// </summary>
-		public virtual void ActiveAbility() { }
+		public virtual void ActiveAbility() { if ( Entity.LifeState != LifeState.Alive ) return; }
 
 		//Run on start
 		/// <summary>
@@ -143,7 +144,7 @@ namespace TTT_Classes
 		[GameEvent.Tick.Client]
 		protected void Look_For_Active_Button_Press()
 		{
-			if ( Game.LocalClient.Pawn == Entity && hasActiveAbility )
+			if ( Game.LocalClient.Pawn == Entity && hasActiveAbility && Entity.LifeState == LifeState.Alive)
 			{
 				if ( AbilityCooldown )
 				{
@@ -173,7 +174,6 @@ namespace TTT_Classes
 				HoldButtonDown = 0;
 			}
 		}
-
 
 	}
 	internal partial class ClassHandler
@@ -413,6 +413,48 @@ namespace TTT_Classes
 		//	}
 		//}
 
+
+		[ConCmd.Client( "class_client_delete_ui" )]
+		protected static void ClientRemoveUI()
+		{
+			if ( Game.IsClient )
+			{
+				Game.RootPanel.ChildrenOfType<ShowClass>().FirstOrDefault()?.DisableUI();
+				Game.RootPanel.ChildrenOfType<ActiveCooldown>().FirstOrDefault()?.DisableActiveUI();
+			}
+		}
+
+		[ConCmd.Client( "class_client_readd_ui" )]
+		protected static void ClientReaddUI()
+		{
+			if ( Game.IsClient )
+			{
+				// For now, delete class when died
+				Game.RootPanel.ChildrenOfType<ActiveCooldown>().FirstOrDefault()?.Delete();
+				var panel = Game.RootPanel.ChildrenOfType<ShowClass>().FirstOrDefault();
+				panel?.Init( "none", Color.Gray );
+				
+			}
+		}
+
+
+		[Event( "Player.PostOnKilled" )]
+		public static void RemoveUIOnDeath( DamageInfo lastFound, TerrorTown.Player ply )
+		{
+			if ( Game.IsServer )
+			{
+				((IClient)ply.Owner)?.SendCommandToClient( "class_client_delete_ui" );
+			}
+		}
+
+		[Event( "Player.PostRespawn" )]
+		public static void PostRezUI( TerrorTown.Player ply )
+		{
+			if ( Game.IsServer )
+			{
+				((IClient)ply.Owner)?.SendCommandToClient( "class_client_readd_ui" );
+			}
+		}
 
 		[ConCmd.Client( "class_add_class_ui" )]
 		public static void AddClassUI(string classname)

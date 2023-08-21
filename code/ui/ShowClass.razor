@@ -3,6 +3,7 @@
 @using System.Collections.Generic;
 @using TerrorTown;
 @using System.Linq;
+@using System;
 @inherits Panel
 
 @namespace TTT_Classes.UI
@@ -31,20 +32,37 @@
     }
 </style>
 
-<div class="hello">
+<div class="hello" style="display: @visibility;">
         @className
     </div>
 
 @code
 {
-    private string className {get; set;}
+    public string className {get; set;}
 
     private Color classColor { get; set; }
+
+    private string visibility { get; set; }
 
     public void Init(string classname, Color classcolor)
     {
         className = classname;
         classColor = classcolor;
+        visibility = "flex";
+    }
+
+    public void DisableUI()
+    {
+        visibility = "none";
+    }
+    public void EnableUI()
+    {
+        visibility = "flex";
+    }
+
+    protected override int BuildHash()
+    {
+        return HashCode.Combine(visibility);
     }
 
 }
