@@ -126,7 +126,7 @@ namespace TTT_Classes
 
 		public override void ActiveAbility()
 		{
-			base.ActiveAbility();
+
 			Entity.Position += new Vector3(0,0,1);
 			Entity.Velocity += Entity.AimRay.Forward.Normal *800f;
 		}
@@ -156,7 +156,6 @@ namespace TTT_Classes
 
 		public override void RoundStartAbility()
 		{
-			base.RoundStartAbility();
 			fart = Cloud.SoundEvent( "smartmario.smallfart" );
 			fart.Create();
 			fartsound = fart.ResourceName;
@@ -233,7 +232,6 @@ namespace TTT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			base.RoundStartAbility();
 			Add_Item_To_Player(new SmartMario1_Items.GrapplingHook());
 			Entity.Components.RemoveAny<TerrorTown.FallDamageComponent>();
 		}
@@ -272,7 +270,6 @@ namespace TTT_Classes
 
 		public override void ActiveAbility()
 		{
-			base.ActiveAbility();
 			if ( glowingEntity == null )
 			{
 				var glowRay = Entity.AimRay;

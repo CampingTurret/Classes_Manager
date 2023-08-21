@@ -60,7 +60,7 @@ namespace TTT_Classes
 		/// <summary>
 		/// Add code that runs when the ability button is held down
 		/// </summary>
-		public virtual void ActiveAbility() { if ( Entity.LifeState != LifeState.Alive ) return; }
+		public virtual void ActiveAbility() { }
 
 		//Run on start
 		/// <summary>
@@ -132,6 +132,17 @@ namespace TTT_Classes
 			float b = Int32.Parse( html_color_code.Substring( 5, 2 ), System.Globalization.NumberStyles.HexNumber )/255f;
 			return new Color(r,g,b); 
 		}
+
+		public void Run_Active_Ability()
+		{
+			if ( Entity.LifeState != LifeState.Alive )
+			{
+				return;
+			}
+			ActiveAbility();
+		}
+
+
 		public void Startup()
 		{
 			RoundStartAbility();
@@ -144,22 +155,20 @@ namespace TTT_Classes
 		[GameEvent.Tick.Client]
 		protected void Look_For_Active_Button_Press()
 		{
-			if ( Game.LocalClient.Pawn == Entity && hasActiveAbility && Entity.LifeState == LifeState.Alive)
+			if ( Game.LocalClient.Pawn == Entity && hasActiveAbility && Entity.LifeState == LifeState.Alive && AbilityCooldown)
 			{
-				if ( AbilityCooldown )
+
+				if ( Input.Down( "Spray" ) )
 				{
-					if ( Input.Down( "Spray" ) )
+					if ( HoldButtonDown > buttonDownDuration )
 					{
-						if ( HoldButtonDown > buttonDownDuration )
+						if ( lastServerCall > 0.1 )
 						{
-							if ( lastServerCall > 0.1 )
-							{
-								ConsoleSystem.Run( "class_runablity_consolecommand", Name );
-								lastServerCall = 0;
-							}
+							ConsoleSystem.Run( "class_runablity_consolecommand", Name );
+							lastServerCall = 0;
 						}
-						return;
 					}
+					return;
 				}
 				HoldButtonDown = 0;
 			}
@@ -229,7 +238,7 @@ namespace TTT_Classes
 			{
 				assginedClass.AbilityCooldown = assginedClass.coolDownTimer;
 				assginedClass.HoldButtonDown = 0;
-				assginedClass.ActiveAbility();
+				assginedClass.Run_Active_Ability();
 				assginedClass.SetCooldown( ConsoleSystem.Caller );
 			}
 			else
