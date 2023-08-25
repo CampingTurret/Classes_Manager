@@ -199,12 +199,9 @@ namespace TTT_Classes
 			float totalFrequency = Enabled_TTT_Classes.Sum( x => x.Frequency );
 			float selection = Game.Random.Float( totalFrequency );
 			float frequencyTrack = 0;
-			Log.Info( Enabled_TTT_Classes );
-			Log.Info( Registered_TTT_Classes );
 			foreach ( TTT_ClassHeader header in Enabled_TTT_Classes )
 			{
 				frequencyTrack = frequencyTrack + header.Frequency;
-				Log.Info( "Helo" );
 				if ( frequencyTrack > selection )
 				{
 					return header.Name;
