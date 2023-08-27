@@ -495,7 +495,8 @@ namespace TTT_Classes
 		[ClientRpc]
 		public static void AnnounceClasses()
 		{
-			TTT_Class classOnPlayer = Game.LocalClient.Pawn.Components.Get<TTT_Class>();
+			if ( Game.LocalPawn is TerrorTown.Player ply && ply.LifeState != LifeState.Alive ) return;
+			TTT_Class classOnPlayer = Game.LocalPawn.Components.Get<TTT_Class>();
 			if ( classOnPlayer == null )
 			{
 				Log.Error( "We don't have an assigned class!" );
@@ -568,10 +569,13 @@ namespace TTT_Classes
 				foreach ( IClient client in Game.Clients )
 				{
 					TerrorTown.Player ply = client.Pawn as TerrorTown.Player;
-					string assigned_class = Select_Random_Class_Name();
+					if ( ply.LifeState == LifeState.Alive )
+					{
+						string assigned_class = Select_Random_Class_Name();
 
-					AssignClass(assigned_class, ply);
-					client.SendCommandToClient( "class_add_class_ui \"" + assigned_class + "\"" );
+						AssignClass( assigned_class, ply );
+						client.SendCommandToClient( "class_add_class_ui \"" + assigned_class + "\"" );
+					}
 				};
 				AnnounceClasses();
 			}
