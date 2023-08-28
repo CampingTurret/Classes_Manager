@@ -170,8 +170,8 @@ namespace TTT_Classes
 					}
 					return;
 				}
-				HoldButtonDown = 0;
 			}
+			HoldButtonDown = 0;
 		}
 
 		[ClientRpc]
@@ -185,20 +185,34 @@ namespace TTT_Classes
 		}
 
 	}
-	internal partial class ClassHandler
+	internal static partial class ClassHandler
 	{
 		public static IList<TTT_ClassHeader> Registered_TTT_Classes { get; private set; } = new List<TTT_ClassHeader>();
 
 		// Classes are disabled when they have less than 0 frequency. By saving it this way we can remember both whether a class is enabled and it's frequency in a single float.
 		public static IEnumerable<TTT_ClassHeader> Enabled_TTT_Classes { get { return Registered_TTT_Classes.Where( x => x.Frequency > 0 ); } }
 
+		public static List<string> ChosenClasses { get; private set; } = new List<string>();
+
 
 		private static string Select_Random_Class_Name()
 		{
-			int AmountOfClasses = Enabled_TTT_Classes.Count();
-			float totalFrequency = Enabled_TTT_Classes.Sum( x => x.Frequency );
+			float totalFrequency = Enabled_TTT_Classes.Where(x => !ChosenClasses.Contains(x.Name)).Sum( x => x.Frequency );
 			float selection = Game.Random.Float( totalFrequency );
 			float frequencyTrack = 0;
+			foreach ( TTT_ClassHeader header in Enabled_TTT_Classes.Where( x => !ChosenClasses.Contains( x.Name ) ) )
+			{
+				frequencyTrack = frequencyTrack + header.Frequency;
+				if ( frequencyTrack > selection )
+				{
+					ChosenClasses.Add( header.Name );
+					return header.Name;
+				}
+			}
+			// If it gets here there were not enough classes anymore so just dupe one
+			totalFrequency = Enabled_TTT_Classes.Sum( x => x.Frequency );
+			selection = Game.Random.Float( totalFrequency );
+			frequencyTrack = 0;
 			foreach ( TTT_ClassHeader header in Enabled_TTT_Classes )
 			{
 				frequencyTrack = frequencyTrack + header.Frequency;
@@ -421,7 +435,7 @@ namespace TTT_Classes
 
 
 		[ConCmd.Client( "class_client_delete_ui" )]
-		protected static void ClientRemoveUI()
+		public static void ClientRemoveUI()
 		{
 			if ( Game.IsClient )
 			{
@@ -433,7 +447,7 @@ namespace TTT_Classes
 		}
 
 		[ConCmd.Client( "class_client_readd_ui" )]
-		protected static void ClientReaddUI()
+		public static void ClientReaddUI()
 		{
 			if ( Game.IsClient )
 			{
@@ -493,9 +507,11 @@ namespace TTT_Classes
 		}
 
 		[ClientRpc]
-		public static void AnnounceClasses()
+		public static async void AnnounceClasses()
 		{
 			if ( Game.LocalPawn is TerrorTown.Player ply && ply.LifeState != LifeState.Alive ) return;
+			// Wait for server to work
+			await Task.Delay( 250 );
 			TTT_Class classOnPlayer = Game.LocalPawn.Components.Get<TTT_Class>();
 			if ( classOnPlayer == null )
 			{
@@ -577,6 +593,7 @@ namespace TTT_Classes
 						client.SendCommandToClient( "class_add_class_ui \"" + assigned_class + "\"" );
 					}
 				};
+				ChosenClasses = new List<string>();
 				AnnounceClasses();
 			}
 

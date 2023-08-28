@@ -148,17 +148,10 @@ namespace TTT_Classes
 		public override bool hasActiveAbility { get; set; } = true;
 		public override float coolDownTimer { get; set; } = 20f;
 		public override float buttonDownDuration { get; set; } = 0f;
-
-		private string fartsound ;
-
-		private SoundEvent fart { get; set; }
 		private Particles Particle { get; set; }
 
 		public override void RoundStartAbility()
 		{
-			fart = Cloud.SoundEvent( "smartmario.smallfart" );
-			fart.Create();
-			fartsound = fart.ResourceName;
 	}
 		public override void ActiveAbility()
 		{
@@ -169,7 +162,7 @@ namespace TTT_Classes
 			ParticleCleanupSystem.RegisterForCleanup( Particle );
 
 			
-			Entity.PlaySound( "mgfart" );
+			Entity.PlaySound( "classfart" );
 			foreach ( Entity item in Sandbox.Entity.FindInSphere( Entity.Position, 200f ) )
 			{
 				if ( item == Entity ) { continue; }
@@ -197,8 +190,8 @@ namespace TTT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			((TerrorTown.WalkController)Entity.MovementController).SpeedMultiplier = 3f;
-			Entity.LocalScale = 0.5f;
+			((TerrorTown.WalkController)Entity.MovementController).SpeedMultiplier = 1.75f;
+			Entity.LocalScale = 0.75f;
 		}
 
 		[GameEvent.Tick.Server]
