@@ -442,7 +442,7 @@ namespace TTT_Classes
 				var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault();
 				health?.SetProperty( "style", "border-top-left-radius: 12px; border-top-right-radius: 12px;" );
 				Game.RootPanel.ChildrenOfType<ShowClass>().FirstOrDefault()?.DisableUI();
-				Game.RootPanel.ChildrenOfType<ActiveCooldown>().FirstOrDefault()?.DisableActiveUI();
+				Game.RootPanel.ChildrenOfType<ActiveCooldown>().FirstOrDefault()?.Delete();
 			}
 		}
 
@@ -469,6 +469,7 @@ namespace TTT_Classes
 			if ( Game.IsServer )
 			{
 				((IClient)ply.Owner)?.SendCommandToClient( "class_client_delete_ui" );
+				ply.Components.RemoveAny<TTT_Class>();
 			}
 		}
 

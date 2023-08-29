@@ -79,21 +79,12 @@
 
     private string visibility { get; set; } = "flex";
 
-    public void DisableActiveUI()
-    {
-        visibility = "none";
-    }
-    public void EnableActiveUI()
-    {
-        visibility = "flex";
-    }
-
     protected override int BuildHash()
     {
         var player_class = Game.LocalPawn.Components.Get<TTT_Class>();
         if (player_class == null)
         {
-            Log.Error("Have active cooldown, but couldn't find player class!");
+            Log.Error("Have an active ability, but no class. Contact SmartMario1.");
         }
         if (Input.Down("Spray"))
         {
