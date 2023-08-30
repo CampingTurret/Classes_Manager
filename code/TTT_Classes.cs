@@ -121,17 +121,74 @@ namespace TTT_Classes
 		public override Color Color { get; set; } = Color.FromRgb( 0x80461B );
 
 		public override bool hasActiveAbility { get; set; } = true;
-		public override float coolDownTimer { get; set; } = 15f;
-		public override float buttonDownDuration { get; set; } = 1.5f;
+		public override float coolDownTimer { get; set; } = 12f;
+		public override float buttonDownDuration { get; set; } = 1f;
 
 		public override void ActiveAbility()
 		{
 
 			Entity.Position += new Vector3(0,0,1);
-			Entity.Velocity += Entity.AimRay.Forward.Normal *800f;
+			Entity.Velocity += Vector3.Lerp(Entity.AimRay.Forward.Normal, Vector3.Up, 0.25f) * 1000f;
 		}
 		public override void RoundStartAbility()
 		{
+			Entity.Components.RemoveAny<TerrorTown.FallDamageComponent>();
+		}
+	}
+
+	public class DurationTestJetpack : TTT_Class
+	{
+
+		public override string Name { get; set; } = "Faulty Jetpacker";
+		public override string Description { get; set; } = "You came prepared with your trusty jetpack! Use your active to activate it. Just don't depend on it too much...";
+		public override float Frequency { get; set; } = 0.80f;
+		public override Color Color { get; set; } = Color.FromRgb( 0xfa8211 );
+
+		public override bool hasActiveAbility { get; set; } = true;
+		public override float coolDownTimer { get; set; } = 20f;
+		public override float buttonDownDuration { get; set; } = 1.5f;
+
+		public override bool hasDuration { get; set; } = true;
+
+		public override float Duration { get; set; } = 5f;
+
+		private bool Active { get; set; } = false;
+		private RealTimeSince SetActive { get; set; }
+
+		public override void ActiveAbility()
+		{
+			Active = true;
+			SetActive = 0;
+		}
+
+		[GameEvent.Tick.Server]
+		public void DoDuration()
+		{
+			if (Active)
+			{
+				if (SetActive > Duration )
+				{
+					Active = false;
+					Entity.Velocity += Vector3.Lerp( Vector3.Lerp(Entity.AimRay.Forward.Normal, Vector3.Down, 0.5f), Vector3.Up, Game.Random.Float(0, 1) ) * Game.Random.Float(1000, 1750);
+					if (Game.Random.Int(4) == 4)
+					{
+						var expl = new TerrorTown.ExplosionEntity();
+						expl.Damage = 35f;
+						expl.Radius = 300f;
+						expl.ForceScale = 10f;
+						expl.Position = Entity.Position;
+						expl.Explode(null);
+					}
+					return;
+				}
+				Entity.Position += new Vector3( 0, 0, 1 );
+				Entity.Velocity += Vector3.Lerp(Entity.AimRay.Forward.Normal, Vector3.Up, Game.Random.Float( 0.45f, 0.65f ) ) * 20f;
+			}
+		}
+
+		public override void RoundStartAbility()
+		{
+			Active = false;
 			Entity.Components.RemoveAny<TerrorTown.FallDamageComponent>();
 		}
 	}

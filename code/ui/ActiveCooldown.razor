@@ -25,7 +25,7 @@
     }
 
     .progressbarbg {
-        border: 0.5px solid rgba(128,128,128,0.16) font-size: 30px;
+        border: 0.5px solid rgba(128,128,128,0.16);
         box-shadow: 0px 0px 24px rgba(0,0,0,0.4); 
         width: 100%;
         max-height: 100%;
@@ -39,7 +39,6 @@
         top: 0;
         left: 0;
         height: 100%;
-        background-color: #33D733;
     }
 
     .progress-text {
@@ -60,7 +59,7 @@
 <div class="hello">
     <div class="progressbarbg">
 
-        <div class="progress" style="width: @(widthcalc)%"></div>
+        <div class="progress" style="width: @(widthcalc)%; background-color: @(bgcolor);"></div>
         <div class="progress" style="width: @(pushbutton)%; background-color:rgba(0,50, 200, 0.4)"></div>
         <div class="progress-text">@("Active (" + Input.GetButtonOrigin("Spray") + ")")</div>
     </div>
@@ -79,6 +78,8 @@
 
     private string visibility { get; set; } = "flex";
 
+    private string bgcolor { get; set; } = "#33D733";
+
     protected override int BuildHash()
     {
         var player_class = Game.LocalPawn.Components.Get<TTT_Class>();
@@ -94,7 +95,16 @@
         {
             pushbutton = 0;
         }
-        widthcalc = Math.Clamp((player_class.AbilityCooldown.Fraction * 100), 0, 100);
-        return HashCode.Combine(pushbutton, widthcalc, visibility);
+
+        if (player_class.hasDuration)
+        {
+            bgcolor = (player_class.AbilityCooldown.Passed < player_class.Duration) ? "#F2F249" : "#33D733";
+            widthcalc = Math.Clamp(((player_class.AbilityCooldown.Passed < player_class.Duration) ? (((player_class.Duration - player_class.AbilityCooldown.Passed) / player_class.Duration) * 100) : ((player_class.AbilityCooldown.Passed - player_class.Duration) / player_class.coolDownTimer) * 100), 0, 100);
+        }
+        else
+        {
+            widthcalc = Math.Clamp((player_class.AbilityCooldown.Fraction * 100), 0, 100);
+        }
+        return HashCode.Combine(pushbutton, widthcalc, visibility, bgcolor);
     }
 }

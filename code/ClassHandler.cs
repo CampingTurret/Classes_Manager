@@ -27,7 +27,10 @@ namespace TTT_Classes
 		public float Frequency { get; set; }
 
 		public bool hasActiveAbility { get; set; }
-		public TTT_ClassHeader(string name, Color color, string description, TypeDescription typeDescription, float frequency, bool hasactiveAbility) 
+
+		public bool hasDuration { get; set; }
+
+		public TTT_ClassHeader(string name, Color color, string description, TypeDescription typeDescription, float frequency, bool hasactiveAbility, bool hasduration) 
 		{
 			Name = name;
 			Description = description;
@@ -35,6 +38,7 @@ namespace TTT_Classes
 			TypeDescription = typeDescription;
 			Frequency = Math.Clamp( frequency, 0f, 1f );
 			hasActiveAbility = hasactiveAbility;
+			hasDuration = hasduration;
 		}
 
 	}
@@ -55,6 +59,8 @@ namespace TTT_Classes
 		public virtual bool hasActiveAbility { get; set; } = false;
 		public virtual float coolDownTimer { get; set; } = 60f;
 		public virtual float buttonDownDuration { get; set; } = 1f;
+		public virtual bool hasDuration { get; set; } = false;
+		public virtual float Duration { get; set; } = 0f;
 
 		//Run on Ability Trigger
 		/// <summary>
@@ -179,7 +185,7 @@ namespace TTT_Classes
 		{
 			if (Game.LocalClient == target)
 			{
-				AbilityCooldown = coolDownTimer;
+				AbilityCooldown = hasDuration ? coolDownTimer + Duration : coolDownTimer ;
 				HoldButtonDown = 0;
 			}
 		}
@@ -247,7 +253,7 @@ namespace TTT_Classes
 
 			if ( assginedClass.AbilityCooldown )
 			{
-				assginedClass.AbilityCooldown = assginedClass.coolDownTimer;
+				assginedClass.AbilityCooldown = assginedClass.hasDuration ? assginedClass.coolDownTimer + assginedClass.Duration : assginedClass.coolDownTimer;
 				assginedClass.HoldButtonDown = 0;
 				assginedClass.Run_Active_Ability();
 				assginedClass.SetCooldown( ConsoleSystem.Caller );
@@ -277,7 +283,7 @@ namespace TTT_Classes
 		internal static TTT_ClassHeader Convert_TTT_Class_2_Header( TypeDescription typeDescription )
 		{
 			TTT_Class temp = typeDescription.Create<TTT_Class>();
-			TTT_ClassHeader header = new TTT_ClassHeader( temp.Name, temp.Color, temp.Description, typeDescription, temp.Frequency, temp.hasActiveAbility );
+			TTT_ClassHeader header = new TTT_ClassHeader( temp.Name, temp.Color, temp.Description, typeDescription, temp.Frequency, temp.hasActiveAbility, temp.hasDuration );
 			return header;
 		}
 
@@ -557,7 +563,7 @@ namespace TTT_Classes
 
 			foreach ( TTT_ClassHeader header in Registered_TTT_Classes )
 			{
-				classPairs.Add( header.Name, header.Frequency );
+				classPairs.TryAdd( header.Name, header.Frequency );
 			}
 
 			string settings = Json.Serialize( classPairs );
