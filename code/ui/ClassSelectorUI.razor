@@ -186,11 +186,12 @@
         @if(activeTab == "Settings")
         {
             <div style="background-color: #333; padding: 10px; margin: 10px;" class="hello">
-                All miscellaneous settings are here. (none for now)
+                All miscellaneous settings are here.
             </div>
             <div style="max-width: 100%; height: 70%; flex-direction: column; background-color: rgba(200, 200, 200, 0.2); margin: 10px; border-radius: 10px; overflow-y: scroll">
+                <TextEntry class="hello inputfield" style="max-width: 100%; width: auto;" Text="@ClassHandler.ClassRoundChance.ToString("0.00")" Prefix="Class chance per round" Numeric=@true MaxValue=@(1f) MinValue=@(0f) @ref="ChanceField" onsubmit=@SubmitMisc/>
             </div>
-            <div class="hello button" style="width: 90%; margin: 10px; max-width: 100%; justify-content: center; align-self: center; border-radius: 10px;" onmousedown=@Submit>
+            <div class="hello button" style="width: 90%; margin: 10px; max-width: 100%; justify-content: center; align-self: center; border-radius: 10px;" onmousedown=@SubmitMisc>
                 Save settings
             </div>
             return;
@@ -246,6 +247,8 @@
 
     private TextEntry TextField { get; set; }
 
+    private TextEntry ChanceField { get; set; }
+
     private void SetActiveTab(string name)
     {
         activeTab = name;
@@ -275,9 +278,17 @@
         AllClasses = all.OrderBy(x => x.Name).ToList();
     }
 
+    private void SubmitMisc()
+    {
+        var realchance = Math.Clamp(float.Parse(ChanceField.Value), 0, 1);
+        ClassHandler.ClassRoundChance = realchance;
+        ConsoleSystem.Run("class_set_round_chance", realchance);
+    }
+    
     private void ToggleUI()
     {
         ConsoleSystem.Run("class_save_config");
         ConsoleSystem.Run("class_toggle_ui");
+
     }
 }

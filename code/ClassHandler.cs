@@ -193,6 +193,7 @@ namespace TTT_Classes
 	}
 	internal static partial class ClassHandler
 	{
+		public static float ClassRoundChance { get; set; }
 		public static IList<TTT_ClassHeader> Registered_TTT_Classes { get; private set; } = new List<TTT_ClassHeader>();
 
 		// Classes are disabled when they have less than 0 frequency. By saving it this way we can remember both whether a class is enabled and it's frequency in a single float.
@@ -345,7 +346,8 @@ namespace TTT_Classes
 
 			string settings = Json.Serialize( classPairs );
 			FileSystem.Data.WriteAllText( "TTT_Class_settings.json", settings );
-			Event.Run( "class_full_sync", settings );
+			FileSystem.Data.WriteAllText( "TTT_Class_chance_setting.json", ClassRoundChance.ToString() );
+			Event.Run( "class_full_sync", settings, ClassRoundChance );
 
 		}
 		[ConCmd.Server( "class_load_config" )]
@@ -371,7 +373,16 @@ namespace TTT_Classes
 					}
 				}
 
-				Event.Run( "class_full_sync", settings );
+				if ( !FileSystem.Data.FileExists( "TTT_Class_chance_setting.json" ) )
+				{
+					ClassRoundChance = 1f;
+					FileSystem.Data.WriteAllText( "TTT_Class_chance_setting.json", ClassRoundChance.ToString() );
+				}
+
+				string chance = FileSystem.Data.ReadAllText( "TTT_Class_chance_setting.json" );
+				ClassRoundChance = Math.Clamp( float.Parse( chance ), 0f, 1f );
+
+				Event.Run( "class_full_sync", settings, ClassRoundChance );
 			}
 		}
 		public static void Generate_Registered_Classes()
@@ -383,7 +394,6 @@ namespace TTT_Classes
 										  where type.TargetType.IsSubclassOf( typeof( TTT_Class ) )
 										  select type).ToList();
 
-			Log.Info( list );
 			if ( list.Count() == 0 )
 			{
 				Log.Error( "No classes were found." );
@@ -423,6 +433,13 @@ namespace TTT_Classes
 			var ttt_class = FindClass( className );
 			if ( ttt_class == null ) { Log.Error( className + " was not found on this server." ); return; }
 			ttt_class.Frequency = Math.Clamp(frequency, -1, 1);
+		}
+
+		[ConCmd.Server( "class_set_round_chance" )]
+		public static void SetRoundChance( float frequency )
+		{
+			if ( !ValidateUser( ConsoleSystem.Caller.Pawn as TerrorTown.Player ) ) { Log.Error( "Insufficient permissions" ); return; }
+			ClassRoundChance = frequency;
 		}
 
 		//[ConCmd.Client( "class_testing" )]
@@ -531,7 +548,7 @@ namespace TTT_Classes
 
 		[Event( "class_full_sync" )]
 		[ClientRpc]
-		public static void FullClientSync( string classJson )
+		public static void FullClientSync( string classJson, float roundchance )
 		{
 			var classPairs = Json.Deserialize<Dictionary<string, float>>( classJson );
 
@@ -542,6 +559,7 @@ namespace TTT_Classes
 					header.Frequency = freqtoadd;
 				}
 			}
+			ClassRoundChance = roundchance;
 		}
 
 		[TerrorTown.ChatCmd( "classes", PermissionLevel.Moderator )]
@@ -567,7 +585,7 @@ namespace TTT_Classes
 			}
 
 			string settings = Json.Serialize( classPairs );
-			Event.Run( "class_full_sync", settings );
+			Event.Run( "class_full_sync", settings, ClassRoundChance );
 		}
 
 		[TerrorTown.ChatCmd( "class_desc", PermissionLevel.User )]
@@ -589,6 +607,7 @@ namespace TTT_Classes
 		{
 			if ( Game.IsServer )
 			{
+				if (Game.Random.Float(0, 1) > ClassRoundChance ) { return; }
 				foreach ( IClient client in Game.Clients )
 				{
 					TerrorTown.Player ply = client.Pawn as TerrorTown.Player;
