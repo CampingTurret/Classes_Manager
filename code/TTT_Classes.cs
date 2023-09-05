@@ -296,7 +296,7 @@ namespace TTT_Classes
 
 		public override bool hasActiveAbility { get; set; } = true;
 		public override float coolDownTimer { get; set; } = 45f;
-		public override float buttonDownDuration { get; set; } = 3f;
+		public override float buttonDownDuration { get; set; } = 0.4f;
 
 		private RealTimeSince grow { get; set; }
 
@@ -323,7 +323,7 @@ namespace TTT_Classes
 			if ( glowingEntity == null )
 			{
 				var glowRay = Entity.AimRay;
-				var glowTrace = Trace.Ray( glowRay, 300f );
+				var glowTrace = Trace.Ray( glowRay, 450f );
 				glowTrace = glowTrace.DynamicOnly();
 				var tr = glowTrace.Ignore(Entity).Run();
 				if ( tr.Entity is TerrorTown.Player modelEntity )
