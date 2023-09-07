@@ -9,6 +9,8 @@ using TerrorTown;
 using GoldDeagle;
 using Sandbox.Physics;
 using SmartMario1_Items;
+using Sandbox.ModelEditor.Nodes;
+
 namespace TTT_Classes
 {
 
@@ -45,8 +47,20 @@ namespace TTT_Classes
 		//Run on start
 		public override void RoundStartAbility()
 		{
-
 			Add_Item_To_Player( new TerrorTown.Visualiser() );
+		}
+	}
+
+	public class ExplosionResist : EntityComponent<TerrorTown.Player>
+	{
+		[Event("Player.PreTakeDamage")]
+		public void CheckExplode( DamageInfo info, TerrorTown.Player ply )
+		{
+			if ( ply != Entity ) return;
+			if ( info.Tags.Contains( "explosion" ) || info.Tags.Contains( "blast" ) )
+			{
+				ply.PendingDamage.Damage = Math.Clamp(info.Damage, 0f, 25f);
+			}
 		}
 	}
 
@@ -54,48 +68,87 @@ namespace TTT_Classes
 	{
 
 		public override string Name { get; set; } = "DemolitionExpert";
-		public override string Description { get; set; } = "Time to blow it all up! You start with a C4.";
-		public override float Frequency { get; set; } = 0.5f;
+		public override string Description { get; set; } = "Time to blow it all up! You start with a C4 and explosion resistance.";
+		public override float Frequency { get; set; } = 0.7f;
 		public override Color Color { get; set; } = Color.FromRgb(0x8c8f9c);
 
 
 		//Run on start
 		public override void RoundStartAbility()
 		{
-	
 			Add_Item_To_Player( new TerrorTown.C4() );
-
+			Entity.Components.Add( new ExplosionResist() );
 		}
 	}
 	public class Magician : TTT_Class
 	{
 
 		public override string Name { get; set; } = "Magician";
-		public override string Description { get; set; } = "Now you see me, now you don't... You start with a teleporter.";
+		public override string Description { get; set; } = "Now you see me, now you don't... You start with a teleporter and can magically hover forward with your active ability! Watch out for pits, you still take fall damage.";
 		public override float Frequency { get; set; } = 1f;
 		public override Color Color { get; set; } = Color.FromRgb( 0xbc3ddb );
+		public override bool hasActiveAbility { get; set; } = true;
+		public override float coolDownTimer { get; set; } = 20f;
+		public override float buttonDownDuration { get; set; } = 0f;
 
+		public override bool hasDuration { get; set; } = true;
+
+		public override float Duration { get; set; } = 5f;
+
+		private bool Active { get; set; } = false;
+		private RealTimeSince SetActive { get; set; }
+
+		public override void ActiveAbility()
+		{
+			base.ActiveAbility();
+			Active = true;
+			SetActive = 0;
+		}
+
+		[GameEvent.Tick.Server]
+		public void DoDuration()
+		{
+			if ( Active )
+			{
+				if ( SetActive > Duration )
+				{
+					Active = false;
+					return;
+				}
+				Entity.Velocity = new Vector3( Entity.Velocity.x, Entity.Velocity.y ) + Entity.AimRay.Forward.Normal;
+			}
+		}
 
 		//Run on start
 		public override void RoundStartAbility()
 		{
+			Active = false;
 			Add_Item_To_Player( new TerrorTown.Teleporter() );
-
 		}
 	}
 	public class WallHack : TTT_Class
 	{
 
 		public override string Name { get; set; } = "WallHacker";
-		public override string Description { get; set; } = "0PP0n3n7s: L0c47ED! You start with a radar.";
+		public override string Description { get; set; } = "0PP0n3n7s: L0c47ED! You start with a radar and can initiate a scan with your active ability.";
 		public override float Frequency { get; set; } = 1f;
 		public override Color Color { get; set; } = Color.Red.Darken( 0.25f );
 
+		public Radar radargiven { get; set; }
+		public override bool hasActiveAbility { get; set; } = true;
+		public override float coolDownTimer { get; set; } = 30f;
+		public override float buttonDownDuration { get; set; } = 0.5f;
+
+		public override void ActiveAbility()
+		{
+			radargiven.Touch( Entity );
+		}
 
 		//Run on start
 		public override void RoundStartAbility()
 		{
-			Add_Item_To_Player( new TerrorTown.Radar() );
+			radargiven = new TerrorTown.Radar();
+			Add_Item_To_Player( radargiven );
 		}
 	}
 	public class Junkie : TTT_Class
