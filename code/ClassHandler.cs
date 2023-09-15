@@ -442,19 +442,19 @@ namespace TTT_Classes
 			ClassRoundChance = frequency;
 		}
 
-		//[ConCmd.Client( "class_testing" )]
-		//public static void test()
-		//{
-		//	foreach(var panel in Game.RootPanel.Children)
-		//	{
-		//		Log.Info( panel );
-		//	}
-		//	foreach(var panel2 in Game.RootPanel.ChildrenOfType<Health>().FirstOrDefault().Children)
-		//	{
-		//		Log.Info( panel2 );
-		//		Log.Info( "bu" );
-		//	}
-		//}
+		[ConCmd.Client( "class_testing" )]
+		public static void test()
+		{
+			foreach ( var panel in Game.RootPanel.Children )
+			{
+				Log.Info( panel );
+			}
+			foreach ( var panel2 in Game.RootPanel.ChildrenOfType<Health>().FirstOrDefault().Children )
+			{
+				Log.Info( panel2 );
+				Log.Info( "bu" );
+			}
+		}
 
 
 		[ConCmd.Client( "class_client_delete_ui" )]
@@ -508,16 +508,16 @@ namespace TTT_Classes
 		[ConCmd.Client( "class_add_class_ui" )]
 		public static void AddClassUI(string classname)
 		{
-			// This line removes the previous class if it exists
-			Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault().Children.Where( x => x.HasClass( "seg" ) ).FirstOrDefault()?.ChildrenOfType<UI.ShowClass>().FirstOrDefault()?.Delete();
-
 			// Finding the assigned class
 			TTT_ClassHeader class_header = FindClass( classname );
 			if ( class_header == null ) { Log.Error( "Could not find given class for UI update." ); return; }
 
 			// These lines alter the existing UI to accomedate our new element.
-			var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault();
+			var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault()?.Children.FirstOrDefault();
 			health?.SetProperty( "style", "border-radius: 0px; border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;" );
+
+			var status = Game.RootPanel.ChildrenOfType<TerrorTown.StatusIconsPanel>().FirstOrDefault();
+			status?.SetProperty( "style", "margin-bottom: 32px; margin-left: 360px" );
 
 			// This adds our new element.
 			var panel = Game.RootPanel.AddChild<UI.ShowClass>();
