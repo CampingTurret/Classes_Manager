@@ -153,6 +153,7 @@ namespace TTT_Classes
 		public override void ActiveAbility()
 		{
 			radargiven.Touch( Entity );
+			Entity.StatusIcons.RemoveIcon( Entity.StatusIcons.StatusIcons.FirstOrDefault() );
 		}
 
 		//Run on start

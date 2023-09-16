@@ -462,7 +462,7 @@ namespace TTT_Classes
 		{
 			if ( Game.IsClient )
 			{
-				var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault();
+				var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault()?.Children.FirstOrDefault();
 				health?.SetProperty( "style", "border-top-left-radius: 12px; border-top-right-radius: 12px;" );
 				Game.RootPanel.ChildrenOfType<ShowClass>().FirstOrDefault()?.DisableUI();
 				Game.RootPanel.ChildrenOfType<ActiveCooldown>().FirstOrDefault()?.Delete();
@@ -477,7 +477,7 @@ namespace TTT_Classes
 				// For now, delete class when died
 				Game.RootPanel.ChildrenOfType<ActiveCooldown>().FirstOrDefault()?.Delete();
 
-				var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault();
+				var health = Game.RootPanel.ChildrenOfType<TerrorTown.Health>().FirstOrDefault()?.Children.FirstOrDefault();
 				health?.SetProperty( "style", "border-top-left-radius: 0px; border-top-right-radius: 0px;" );
 				var panel = Game.RootPanel.ChildrenOfType<ShowClass>().FirstOrDefault();
 				panel?.Init( "none", Color.Gray );
