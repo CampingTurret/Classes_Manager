@@ -62,6 +62,15 @@ namespace TTT_Classes
 				ply.PendingDamage.Damage = Math.Clamp(info.Damage, 0f, 25f);
 			}
 		}
+
+		public void AddIcon()
+		{
+			StatusIcon icon = new StatusIcon
+			{
+				IconPath = "ui/effects/ExplosionResist.png"
+			};
+			Entity.StatusIcons.AddIcon( icon );
+		}
 	}
 
 	public class DemolitionExpert : TTT_Class
@@ -77,7 +86,9 @@ namespace TTT_Classes
 		public override void RoundStartAbility()
 		{
 			Add_Item_To_Player( new TerrorTown.C4() );
-			Entity.Components.Add( new ExplosionResist() );
+			var comp = new ExplosionResist();
+			Entity.Components.Add( comp );
+			comp.AddIcon();
 		}
 	}
 	public class Magician : TTT_Class
