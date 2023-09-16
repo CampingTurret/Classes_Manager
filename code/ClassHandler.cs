@@ -517,7 +517,7 @@ namespace TTT_Classes
 			health?.SetProperty( "style", "border-radius: 0px; border-top-left-radius: 0px; border-top-right-radius: 0px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;" );
 
 			var status = Game.RootPanel.ChildrenOfType<TerrorTown.StatusIconsPanel>().FirstOrDefault();
-			status?.SetProperty( "style", "margin-bottom: 32px; margin-left: 360px" );
+			status?.SetProperty( "style", "margin-bottom: 0px; margin-left: 0px; bottom: 32px; left: 360px" );
 
 			// This adds our new element.
 			var panel = Game.RootPanel.AddChild<UI.ShowClass>();
